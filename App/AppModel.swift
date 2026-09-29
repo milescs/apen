@@ -38,8 +38,10 @@ final class AppModel {
     private(set) var cleanupProgress: Double = 0
     /// Drives the menu-bar popover (MenuBarExtraAccess binding).
     var isMenuPresented = false
+    /// Selected Settings tab ("general", "modes", "models", "cleanup").
+    var settingsTab = "general"
 
-    let settings = AppSettings()
+    let settings = AppSettings(defaults: DemoData.isEnabled ? DemoData.defaults : .standard)
     let models = ModelManager()
     let files: FileTranscriptionModel
 
@@ -80,7 +82,11 @@ final class AppModel {
         var databaseError: String?
         var database: AppDatabase?
         do {
-            database = try AppDatabase(fileURL: Self.supportDirectory.appendingPathComponent("apen.sqlite"))
+            if DemoData.isEnabled {
+                database = try DemoData.makeDatabase()
+            } else {
+                database = try AppDatabase(fileURL: Self.supportDirectory.appendingPathComponent("apen.sqlite"))
+            }
         } catch {
             databaseError = error.localizedDescription
         }
@@ -153,6 +159,24 @@ final class AppModel {
     /// for the microphone, then pastes into the frontmost app. Used by scripts/e2e-paste.sh.
     private func handleDebugURL(_ url: URL) {
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        if url.path == "/show" {
+            switch items.first(where: { $0.name == "window" })?.value {
+            case "history": showHistory()
+            case "dictionary": showDictionary()
+            case "settings":
+                settingsTab = items.first(where: { $0.name == "tab" })?.value ?? "general"
+                showSettings()
+            case "file": showFileTranscription()
+            case "onboarding": showOnboarding()
+            case "about": showAbout()
+            default: break
+            }
+            return
+        }
+        if url.path == "/menu" {
+            isMenuPresented = items.first(where: { $0.name == "open" })?.value != "0"
+            return
+        }
         if url.path == "/snapshot" {
             let directory = URL(fileURLWithPath: items.first(where: { $0.name == "dir" })?.value ?? NSTemporaryDirectory())
             Task { await DebugSnapshots.capture(model: self, into: directory) }
@@ -162,12 +186,14 @@ final class AppModel {
             let path = items.first(where: { $0.name == "file" })?.value
         else { return }
         let speed = items.first(where: { $0.name == "speed" })?.value.flatMap(Double.init) ?? 1
+        let paste = items.first(where: { $0.name == "paste" })?.value != "0"
         pendingSource = .file(URL(fileURLWithPath: path), speed: speed)
         let now = ProcessInfo.processInfo.systemUptime
         handle(.hotkeyDown(at: now))
         handle(.hotkeyUp(at: now))
         Task { [weak self] in
             await self?.startTask?.value
+            if !paste { self?.skipPaste = true }
             guard let session = self?.session else { return }
             await session.waitForFileSourceToFinish()
             try? await Task.sleep(for: .milliseconds(300))
@@ -322,6 +348,9 @@ final class AppModel {
         do {
             let info = try await session.start(source: source)
             deviceName = info.deviceName
+            if DemoData.isEnabled, case .file = source {
+                deviceName = AudioInputDevices.defaultInput()?.name ?? "Microphone"
+            }
             if info.usedFallbackDevice {
                 show(Notice(kind: .info, text: "Selected microphone unavailable — using \(info.deviceName)"), for: .seconds(3))
             }

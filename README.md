@@ -1,7 +1,19 @@
-# Apen
+<p align="center">
+  <img src="docs/screenshots/icon.png" width="160" alt="Apen app icon">
+</p>
 
-Local dictation for macOS, a free replacement for Superwhisper. Press **⌥Space**, talk, and press it again. Your words
-are transcribed on this Mac and pasted into whatever window is selected. Nothing is sent to a server.
+<h1 align="center">Apen</h1>
+
+<p align="center">
+  Local dictation for macOS, a free replacement for Superwhisper. Press <b>⌥Space</b>, talk, and press it again.<br>
+  Your words are transcribed on this Mac and pasted into whatever window is selected. Nothing is sent to a server.
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/menu.png" width="330" alt="Apen's menu bar menu: dictation button, microphone and mode pickers, recent dictations with copy buttons">
+  &nbsp;
+  <img src="docs/screenshots/recording.png" width="430" alt="The recording panel showing the timer, level meter, mode and live transcript">
+</p>
 
 - **Menu bar app** with your recent transcripts (one-click Copy), a microphone picker, and the dictation mode.
 - **Long dictations**: text is transcribed while you talk, so it's ready about a second after you stop, even after
@@ -16,6 +28,20 @@ are transcribed on this Mac and pasted into whatever window is selected. Nothing
   can bias the speech model toward your jargon.
 - **Modes** for the optional cleanup: Coding (prompts for AI coding tools), General, Writing, Message, Email, Notes,
   Raw. Apps switch modes automatically (Cursor/VS Code/Terminal/Claude → Coding, Slack → Message, Mail → Email…).
+
+## Screenshots
+
+| History | Dictionary |
+| --- | --- |
+| ![Searchable history of dictations with copy and delete](docs/screenshots/history.png) | ![Personal dictionary with replacements and a live Try it box](docs/screenshots/dictionary.png) |
+| **Modes** | **Welcome** |
+| ![Dictation modes with apps that switch modes automatically](docs/screenshots/settings-modes.png) | ![First-run checklist for permissions, models and the shortcut](docs/screenshots/welcome.png) |
+
+The menu bar icon shows what Apen is doing:
+
+<img src="docs/screenshots/menu-bar-states.png" width="620" alt="Menu bar icon when ready, recording and transcribing, on light and dark menu bars">
+
+Screenshots use demo data (a Debug build started with `--demo`).
 
 ## Install
 

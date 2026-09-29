@@ -17,19 +17,40 @@ enum DebugSnapshots {
         model.showFileTranscription()
         try? await Task.sleep(for: .seconds(1.5))
         for (index, window) in NSApp.windows.enumerated() where window.isVisible {
-            guard let view = window.contentView?.superview ?? window.contentView,
-                let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds)
-            else { continue }
-            view.cacheDisplay(in: view.bounds, to: rep)
             let name = window.title.isEmpty ? String(describing: type(of: window)) : window.title
             let file = directory.appendingPathComponent("\(index)-\(name.replacingOccurrences(of: " ", with: "_")).png")
-            try? rep.representation(using: .png, properties: [:])?.write(to: file)
+            if let png = layerSnapshot(of: window) { try? png.write(to: file) }
         }
         model.isMenuPresented = false
 
         // SwiftUI-rendered copies (the window captures above miss layer-backed SwiftUI content).
         render(MenuBarView(model: model, isPresented: .constant(true)).padding(1), to: directory.appendingPathComponent("render-menu.png"))
         render(HUDView(model: model), to: directory.appendingPathComponent("render-hud.png"))
+    }
+
+    /// Renders the window's whole layer tree (frame view included) at 2x, which captures SwiftUI content
+    /// that `cacheDisplay` misses.
+    static func layerSnapshot(of window: NSWindow, scale: CGFloat = 2) -> Data? {
+        guard let view = window.contentView?.superview ?? window.contentView else { return nil }
+        view.wantsLayer = true
+        view.layoutSubtreeIfNeeded()
+        view.displayIfNeeded()
+        guard let layer = view.layer else { return nil }
+        let size = view.bounds.size
+        guard let rep = NSBitmapImageRep(
+            bitmapDataPlanes: nil, pixelsWide: Int(size.width * scale), pixelsHigh: Int(size.height * scale),
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+            colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
+            let context = NSGraphicsContext(bitmapImageRep: rep)
+        else { return nil }
+        let cg = context.cgContext
+        cg.scaleBy(x: scale, y: scale)
+        if layer.isGeometryFlipped || view.isFlipped {
+            cg.translateBy(x: 0, y: size.height)
+            cg.scaleBy(x: 1, y: -1)
+        }
+        layer.render(in: cg)
+        return rep.representation(using: .png, properties: [:])
     }
 
     private static func render<V: View>(_ view: V, to url: URL) {
