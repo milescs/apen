@@ -1,0 +1,4 @@
+// Copy to Config/Local.xcconfig and set your team so TCC permissions persist across rebuilds.
+// Find team IDs with: security find-identity -v -p codesigning  (OU field of the certificate)
+DEVELOPMENT_TEAM = ABCDE12345
+CODE_SIGN_IDENTITY = Apple Development

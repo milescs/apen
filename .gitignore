@@ -1,0 +1,18 @@
+# Build products
+.build/
+build/
+DerivedData/
+*.xcodeproj
+*.xcworkspace
+!Packages/**/*.xcworkspace
+.swiftpm/
+
+# Local signing / machine-specific
+Config/Local.xcconfig
+
+# Generated or personal audio
+Fixtures/generated/
+Fixtures/real/
+*.caf
+
+.DS_Store

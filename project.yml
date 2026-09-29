@@ -1,0 +1,71 @@
+name: Utter
+options:
+  bundleIdPrefix: com.milescs
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+
+packages:
+  UtterKit:
+    path: Packages/UtterKit
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 3.1.0
+  MenuBarExtraAccess:
+    url: https://github.com/orchetect/MenuBarExtraAccess
+    from: 1.3.1
+
+targets:
+  Utter:
+    type: application
+    platform: macOS
+    configFiles:
+      Debug: Config/Base.xcconfig
+      Release: Config/Base.xcconfig
+    sources:
+      - path: App
+        excludes:
+          - "**/*.entitlements"
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleName: Utter
+        CFBundleDisplayName: Utter
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.productivity
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSMicrophoneUsageDescription: Utter records your voice while you dictate and transcribes it on this Mac. Audio never leaves your computer.
+        NSHumanReadableCopyright: Local dictation with open-weight models.
+        CFBundleURLTypes:
+          - CFBundleURLName: com.milescs.utter
+            CFBundleURLSchemes: [utter]
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Audio or Video
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [public.audio, public.movie]
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        DEAD_CODE_STRIPPING: YES
+    dependencies:
+      - package: UtterKit
+        product: UtterCore
+      - package: UtterKit
+        product: UtterEngines
+      - package: KeyboardShortcuts
+      - package: MenuBarExtraAccess
+
+schemes:
+  Utter:
+    build:
+      targets:
+        Utter: all
+    run:
+      config: Debug
+    archive:
+      config: Release
