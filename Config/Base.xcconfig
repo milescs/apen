@@ -1,5 +1,7 @@
 // Shared build settings for the Apen app target.
 MACOSX_DEPLOYMENT_TARGET = 26.0
+// Apple silicon only: the speech and cleanup models are tuned for its Neural Engine and GPU.
+ARCHS = arm64
 SWIFT_VERSION = 6.0
 SWIFT_STRICT_CONCURRENCY = complete
 ENABLE_APP_SANDBOX = NO
