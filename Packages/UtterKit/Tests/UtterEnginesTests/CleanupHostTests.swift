@@ -2,8 +2,9 @@ import Foundation
 import Testing
 @testable import UtterEngines
 
+extension ModelBackedTests {
 /// The cleanup LLM runs in a helper process (the `utter` CLI in `--llm-helper` mode) that exits when idle.
-@Suite(.enabled(if: Fixtures.isEnabled && CleanupModel.isDownloaded, "Needs UTTER_INTEGRATION=1 and the cleanup model"), .serialized)
+@Suite(.enabled(if: CleanupModel.isDownloaded, "Needs the cleanup model"), .serialized)
 struct CleanupHostTests {
     static let helper = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
@@ -57,9 +58,9 @@ struct CleanupHostTests {
     }
 }
 
-@Suite(.enabled(if: Fixtures.isEnabled && CleanupModel.isDownloaded, "Needs UTTER_INTEGRATION=1 and the cleanup model"), .serialized)
+@Suite(.enabled(if: CleanupModel.isDownloaded, "Needs the cleanup model"), .serialized)
 struct CleanupEngineTests {
-    let engine = CleanupEngine(host: CleanupHost(helperExecutable: CleanupHostTests.helper))
+    let engine = CleanupEngine(host: CleanupHost(helperExecutable: ModelBackedTests.CleanupHostTests.helper))
 
     @Test("Removes fillers and keeps the meaning")
     func fillers() async throws {
@@ -88,4 +89,5 @@ struct CleanupEngineTests {
         print("cleanup terms: \(result.text)")
         for term in ["RLS", "BPC", "PR"] { #expect(result.text.contains(term)) }
     }
+}
 }

@@ -22,7 +22,6 @@ generate: ## Regenerate Utter.xcodeproj from project.yml
 	xcodegen generate --quiet
 
 build: generate ## Debug build of the app
-	$(XCODEBUILD) -project $(PROJECT) -scheme $(SCHEME) -configuration Debug -derivedDataPath $(DERIVED) build | xcbeautify 2>/dev/null || \
 	$(XCODEBUILD) -project $(PROJECT) -scheme $(SCHEME) -configuration Debug -derivedDataPath $(DERIVED) -quiet build
 
 release: generate ## Release build of the app
@@ -31,8 +30,9 @@ release: generate ## Release build of the app
 test: ## Fast unit tests (UtterCore)
 	cd $(KIT) && swift test --filter UtterCoreTests
 
-integration: fixtures ## Model-backed tests (local models only)
-	cd $(KIT) && UTTER_INTEGRATION=1 UTTER_FIXTURES=$(CURDIR)/Fixtures/generated swift test --filter UtterEnginesTests
+integration: fixtures ## Model-backed tests (local models only; the CLI doubles as the cleanup helper)
+	cd $(KIT) && swift build --product utter && \
+	UTTER_INTEGRATION=1 UTTER_FIXTURES=$(CURDIR)/Fixtures/generated swift test --filter UtterEnginesTests
 
 fixtures: ## Generate speech fixtures with macOS `say`
 	./Fixtures/make-fixtures.sh

@@ -3,8 +3,13 @@ import Testing
 @testable import UtterEngines
 
 /// Model-backed tests. Run with `make integration` (needs `make models` once); skipped otherwise.
-/// Everything runs locally with the open-weight models — no network, no cloud APIs.
+/// Everything runs locally with the open-weight models — no network, no cloud APIs. The suites are nested
+/// in one serialized parent so their memory measurements never overlap.
 @Suite(.enabled(if: Fixtures.isEnabled, "Set UTTER_INTEGRATION=1 and UTTER_FIXTURES to run"), .serialized)
+struct ModelBackedTests {}
+
+extension ModelBackedTests {
+@Suite(.serialized)
 struct EngineIntegrationTests {
     @Test("Short fixtures transcribe with ≤ 8% word error rate", arguments: ["short", "acronyms", "instruction", "ramble"])
     func shortFixtures(name: String) async throws {
@@ -65,6 +70,8 @@ struct EngineIntegrationTests {
         try await Task.sleep(for: .milliseconds(200))
         #expect(await SpeechModelHost.shared.isLoaded == false)
     }
+}
+
 }
 
 enum Fixtures {

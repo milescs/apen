@@ -219,8 +219,7 @@ private struct RecentList: View {
                     .foregroundStyle(record.status == .failed ? .orange : .primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack(spacing: 4) {
-                    Text(record.createdAt, style: .relative)
-                    Text("ago")
+                    Text(record.createdAt, format: .relative(presentation: .named, unitsStyle: .abbreviated))
                     if let source = record.sourceName { Text("· \(source)").lineLimit(1) }
                 }
                 .font(.caption2)
