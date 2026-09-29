@@ -2,34 +2,56 @@ import Foundation
 
 /// Child-process side of the cleanup LLM.
 ///
-/// The app (or CLI) relaunches its own executable with `--llm-helper <model.gguf>`. The helper loads the
-/// model, prints `{"ready":true}`, then answers one JSON request per stdin line until stdin closes.
+/// The app runs its bundled `apen-llm` tool (the CLI uses its own executable) with `--llm-helper <model.gguf>`.
+/// The helper loads the model, prints `{"ready":true}`, then answers one JSON request per stdin line until
+/// stdin closes.
 /// Running the model out of process means every byte it used (including Metal allocations llama.cpp
 /// can't release) goes back to the system the moment the dictation ends.
 public enum LLMHelper {
     public static let flag = "--llm-helper"
 
-    struct Request: Codable {
-        let id: Int
-        let messages: [Message]
-        let maxTokens: Int
-        let timeoutSeconds: Double?
+    package struct Request: Codable {
+        package let id: Int
+        package let messages: [Message]
+        package let maxTokens: Int
+        package let timeoutSeconds: Double?
         /// Typical output length, used only to report progress.
-        var expectedTokens: Int?
+        package var expectedTokens: Int?
+
+        package init(id: Int, messages: [Message], maxTokens: Int, timeoutSeconds: Double?, expectedTokens: Int?) {
+            self.id = id
+            self.messages = messages
+            self.maxTokens = maxTokens
+            self.timeoutSeconds = timeoutSeconds
+            self.expectedTokens = expectedTokens
+        }
     }
 
-    struct Message: Codable {
-        let role: String
-        let content: String
+    package struct Message: Codable {
+        package let role: String
+        package let content: String
+
+        package init(role: String, content: String) {
+            self.role = role
+            self.content = content
+        }
     }
 
-    struct Response: Codable {
-        var ready: Bool?
-        var id: Int?
-        var text: String?
-        var error: String?
+    package struct Response: Codable {
+        package var ready: Bool?
+        package var id: Int?
+        package var text: String?
+        package var error: String?
         /// 0…1 while generating (estimated from `expectedTokens`).
-        var progress: Double?
+        package var progress: Double?
+
+        package init(ready: Bool? = nil, id: Int? = nil, text: String? = nil, error: String? = nil, progress: Double? = nil) {
+            self.ready = ready
+            self.id = id
+            self.text = text
+            self.error = error
+            self.progress = progress
+        }
     }
 
     /// For synchronous `main.swift` entry points: runs the helper and exits the process; never returns.

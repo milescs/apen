@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<!-- Dictation -->
+	<key>com.apple.security.device.audio-input</key>
+	<true/>
+	<!-- One-time model downloads from Hugging Face -->
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<!-- Transcribe File… (open panel, drag and drop) and Save as Text… -->
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+</dict>
+</plist>

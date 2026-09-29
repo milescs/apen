@@ -1,0 +1,10 @@
+Apen is a voice dictation (speech-to-text) app: a voice input method, which is an accessibility use for people who can't or prefer not to type.
+
+How to test:
+1. Launch Apen. It lives in the menu bar (an "A" with a leaf) and opens a welcome window.
+2. Click Allow Microphone, then Download next to "Speech model" (about 600 MB from Hugging Face, one time).
+3. Click into any text field (for example in TextEdit), press Option-Space, say a sentence, and press Option-Space again. The text is pasted into the field.
+
+Why Accessibility: Apen uses it only to press Command-V once, inserting the text the user just dictated into the field they are typing in, as a keyboard would. It does not read or control other apps. Without the permission Apen copies the text to the clipboard instead and remains fully functional.
+
+Downloads: the speech model and the optional cleanup model are machine-learning weights (data, not code), downloaded only when the user clicks Download, with the size shown first. All processing happens on the Mac; no user data is sent anywhere. No account or sign-in is needed.

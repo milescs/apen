@@ -1,5 +1,6 @@
 import Foundation
 import ApenEngines
+import ApenLLM
 
 // Command-line companion for model management, headless transcription and measurements.
 //

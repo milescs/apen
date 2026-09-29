@@ -7,6 +7,7 @@ let package = Package(
     products: [
         .library(name: "ApenCore", targets: ["ApenCore"]),
         .library(name: "ApenEngines", targets: ["ApenEngines"]),
+        .library(name: "ApenLLM", targets: ["ApenLLM"]),
         .executable(name: "apen", targets: ["apen-cli"]),
     ],
     dependencies: [
@@ -23,19 +24,20 @@ let package = Package(
             name: "ApenCore",
             dependencies: [.product(name: "GRDB", package: "GRDB.swift")]
         ),
+        .target(name: "ApenLLM", dependencies: ["llama"]),
         .target(
             name: "ApenEngines",
             dependencies: [
                 "ApenCore",
+                "ApenLLM",
                 .product(name: "FluidAudio", package: "FluidAudio"),
-                "llama",
             ]
         ),
-        .executableTarget(name: "apen-cli", dependencies: ["ApenEngines"]),
+        .executableTarget(name: "apen-cli", dependencies: ["ApenEngines", "ApenLLM"]),
         .testTarget(
             name: "ApenCoreTests",
             dependencies: ["ApenCore", .product(name: "GRDB", package: "GRDB.swift")]
         ),
-        .testTarget(name: "ApenEnginesTests", dependencies: ["ApenEngines"]),
+        .testTarget(name: "ApenEnginesTests", dependencies: ["ApenEngines", "ApenLLM"]),
     ]
 )

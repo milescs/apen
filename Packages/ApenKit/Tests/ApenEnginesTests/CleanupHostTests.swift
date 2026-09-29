@@ -1,3 +1,4 @@
+import ApenLLM
 import Foundation
 import Testing
 @testable import ApenEngines

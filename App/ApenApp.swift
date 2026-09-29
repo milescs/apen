@@ -1,7 +1,7 @@
 import MenuBarExtraAccess
 import SwiftUI
 
-
+@main
 struct ApenApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 

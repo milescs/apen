@@ -1,0 +1,6 @@
+// Local test build of the App Store variant: sandboxed, with Debug hooks, under its own bundle ID so its
+// container, preferences and permissions never touch the regular app's.
+#include "AppStore.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = com.milescs.apen.sandboxtest
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG APPSTORE

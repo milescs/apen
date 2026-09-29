@@ -16,3 +16,6 @@ Fixtures/real/
 *.caf
 
 .DS_Store
+
+# Release credentials (team/key IDs; the .p8 stays in ~/.appstoreconnect)
+Config/Release.env

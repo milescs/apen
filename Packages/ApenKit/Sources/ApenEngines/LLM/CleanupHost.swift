@@ -1,3 +1,4 @@
+import ApenLLM
 import Foundation
 
 /// Runs the cleanup LLM in a helper process that exists only while a dictation needs it.
@@ -15,15 +16,21 @@ public actor CleanupHost {
     private var keepWarm: Duration = .zero
     private var shutdownTask: Task<Void, Never>?
 
-    /// - Parameter helperExecutable: a binary that implements `LLMHelper.flag`; defaults to the current
-    ///   executable, or `APEN_LLM_HELPER` when set (tests).
+    /// - Parameter helperExecutable: a binary that implements `LLMHelper.flag`. Defaults to `APEN_LLM_HELPER`
+    ///   when set (tests), else the app's bundled `apen-llm` tool, else — outside an app bundle, i.e. the
+    ///   CLI — the current executable. An app never relaunches itself: in the App Sandbox the system aborts
+    ///   a child that carries its own sandbox entitlements, so the helper is a separate inheriting tool.
     public init(helperExecutable: URL? = nil) {
         if let helperExecutable {
             self.helperExecutable = helperExecutable
         } else if let override = ProcessInfo.processInfo.environment["APEN_LLM_HELPER"] {
             self.helperExecutable = URL(fileURLWithPath: override)
-        } else {
+        } else if let bundled = Bundle.main.url(forAuxiliaryExecutable: "apen-llm") {
+            self.helperExecutable = bundled
+        } else if Bundle.main.bundleURL.pathExtension != "app" {
             self.helperExecutable = Bundle.main.executableURL
+        } else {
+            self.helperExecutable = nil
         }
     }
 

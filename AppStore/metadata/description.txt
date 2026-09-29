@@ -1,0 +1,32 @@
+Apen turns your voice into text in any app, without sending a single word to the cloud.
+
+Press Option-Space (or your own shortcut), talk, and press it again. Apen transcribes on your Mac's Neural Engine and pastes the text wherever your cursor is: a prompt box, a code editor, an email, a chat.
+
+DICTATE ANYWHERE
+• Works in every app: AI chat apps, code editors, terminals, mail and notes
+• Tap the shortcut to start and stop, or hold it while you talk
+• See the transcript while you speak; the final text is ready about a second after you stop, even after ten minutes
+• Switch microphones right from the menu bar
+
+PRIVATE BY DESIGN
+• Speech recognition runs on your Mac with NVIDIA's open-weight Parakeet model
+• Nothing you say leaves your Mac: no account, no analytics, no servers
+• Models load only while you dictate and are released right after
+
+OPTIONAL CLEANUP WITH A LOCAL LLM
+• Removes filler words and false starts, fixes punctuation
+• Modes for coding prompts, writing, messages, email and notes, chosen automatically by the app you're typing in
+• Your dictation is tidied, never answered or rewritten into something else
+
+YOUR WORDS, YOUR DICTIONARY
+• Teach Apen your acronyms and jargon: say "RLS", get "row-level security"
+• Fix names the speech model tends to get wrong
+
+HISTORY AND FILES
+• Every transcript is saved on your Mac with one-click copy
+• Search everything you've dictated
+• Transcribe audio and video files too
+
+Apen is free and open source: github.com/milescs/apen
+
+Requires a Mac with Apple silicon and macOS 26 or later. The speech model (about 600 MB) downloads once when you first set up Apen; the optional cleanup model is 2.5 GB.

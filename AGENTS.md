@@ -24,9 +24,13 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
 | `project.yml` | XcodeGen spec (the `.xcodeproj` is generated and gitignored) |
 | `App/` | App target: SwiftUI + AppKit glue (menu bar, HUD, hotkeys, paste, windows) |
 | `Packages/ApenKit/Sources/ApenCore` | Pure logic + GRDB stores (dictionary matcher, trigger state machine, text utilities, cleanup prompt/guard) |
-| `Packages/ApenKit/Sources/ApenEngines` | FluidAudio + llama.cpp: audio capture/decoding, live transcription, model management, cleanup runtime |
+| `Packages/ApenKit/Sources/ApenEngines` | FluidAudio: audio capture/decoding, live transcription, model management; `CleanupHost` drives the cleanup helper |
+| `Packages/ApenKit/Sources/ApenLLM` | llama.cpp runtime and the helper's JSON-lines protocol (`LLMHelper`) |
+| `App/Helper` | `apen-llm`, the cleanup helper tool embedded in `Apen.app/Contents/MacOS` |
 | `Packages/ApenKit/Sources/apen-cli` | `apen` CLI: model downloads, headless transcription, memory measurements |
 | `Fixtures/` | `make-fixtures.sh` (speech fixtures via `say`); `Fixtures/real/` holds personal recordings (gitignored) |
+| `Config/` | xcconfigs: `Base` (Debug/Release), `AppStore` (sandboxed store build), `AppStoreDebug` (sandbox testing under `com.milescs.apen.sandboxtest`); gitignored `Local.xcconfig` (signing) and `Release.env` (release IDs) |
+| `AppStore/metadata/` | App Store listing text and review notes |
 
 ## Commands
 
@@ -40,6 +44,8 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
 | Install to /Applications | `make install` |
 | Transcribe a file headlessly | `cd Packages/ApenKit && swift run apen transcribe <file> --memory` |
 | Reset permissions | `make reset-tcc` |
+| Signed GitHub download | `./scripts/release-github.sh` (Developer ID, notarized; needs `Config/Release.env`) |
+| App Store upload | `./scripts/release-appstore.sh` (archives the `AppStore` configuration and uploads it) |
 
 ## Conventions
 
@@ -49,3 +55,8 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
 - All Core ML calls go through `CoreMLGate` (concurrent FluidAudio managers can crash).
 - FluidAudio's README/API docs are stale; read the source at the pinned tag in `.build/checkouts/FluidAudio`.
 - Behavior changes ship with tests next to the code (`Tests/ApenCoreTests`, `Tests/ApenEnginesTests`).
+- The cleanup model runs out of process in `apen-llm`, never in the app (Metal keeps ~220 MB resident) and never by
+  relaunching the app binary (the App Sandbox aborts that). In the store build its entitlements must stay exactly
+  `app-sandbox` + `inherit`.
+- Store-only differences go behind `#if APPSTORE`. Releases never print or commit the App Store Connect key; it stays
+  in `~/.appstoreconnect/private_keys/`.

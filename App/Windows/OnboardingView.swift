@@ -60,6 +60,7 @@ struct OnboardingView: View {
                     Text("Tap to toggle, or hold while you talk. Esc cancels.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    #if !APPSTORE
                     if superwhisperRunning {
                         HStack {
                             Label("Superwhisper is running and also uses ⌥Space.", systemImage: "exclamationmark.triangle.fill")
@@ -67,6 +68,7 @@ struct OnboardingView: View {
                             Button("Quit Superwhisper") { quitSuperwhisper() }
                         }
                     }
+                    #endif
                     Toggle("Open Apen at login", isOn: $launchAtLogin)
                         .onChange(of: launchAtLogin) { _, enabled in
                             try? LoginItem.set(enabled)

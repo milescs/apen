@@ -6,6 +6,12 @@ options:
   createIntermediateGroups: true
   developmentLanguage: en
 
+configs:
+  Debug: debug
+  Release: release
+  AppStore: release
+  AppStoreDebug: debug
+
 packages:
   ApenKit:
     path: Packages/ApenKit
@@ -23,10 +29,13 @@ targets:
     configFiles:
       Debug: Config/Base.xcconfig
       Release: Config/Base.xcconfig
+      AppStore: Config/AppStore.xcconfig
+      AppStoreDebug: Config/AppStoreDebug.xcconfig
     sources:
       - path: App
         excludes:
           - "**/*.entitlements"
+          - "Helper/**"
     info:
       path: App/Info.plist
       properties:
@@ -39,6 +48,7 @@ targets:
         LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
         NSMicrophoneUsageDescription: Apen records your voice while you dictate and transcribes it on this Mac. Audio never leaves your computer.
         NSHumanReadableCopyright: Local dictation with open-weight models.
+        ITSAppUsesNonExemptEncryption: false
         CFBundleURLTypes:
           - CFBundleURLName: com.milescs.apen
             CFBundleURLSchemes: [apen]
@@ -59,6 +69,41 @@ targets:
         product: ApenEngines
       - package: KeyboardShortcuts
       - package: MenuBarExtraAccess
+      - target: ApenLLMHelper
+        embed: true
+        codeSign: true
+        copy:
+          destination: executables
+
+  ApenLLMHelper:
+    type: tool
+    platform: macOS
+    configFiles:
+      Debug: Config/Base.xcconfig
+      Release: Config/Base.xcconfig
+      AppStore: Config/AppStore.xcconfig
+      AppStoreDebug: Config/AppStoreDebug.xcconfig
+    sources:
+      - path: App/Helper
+        excludes:
+          - "*.entitlements"
+    settings:
+      base:
+        PRODUCT_NAME: apen-llm
+        PRODUCT_BUNDLE_IDENTIFIER: com.milescs.apen.llm-helper
+        CODE_SIGN_ENTITLEMENTS: App/Helper/Helper.entitlements
+        GENERATE_INFOPLIST_FILE: YES
+        CREATE_INFOPLIST_SECTION_IN_BINARY: YES
+        LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks"
+        SKIP_INSTALL: YES
+      configs:
+        AppStore:
+          CODE_SIGN_ENTITLEMENTS: App/Helper/Helper-AppStore.entitlements
+        AppStoreDebug:
+          CODE_SIGN_ENTITLEMENTS: App/Helper/Helper-AppStore.entitlements
+    dependencies:
+      - package: ApenKit
+        product: ApenLLM
 
 schemes:
   Apen:

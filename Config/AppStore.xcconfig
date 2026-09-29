@@ -1,0 +1,8 @@
+// Mac App Store build: sandboxed with the hardened runtime. Distribution signing is applied when
+// scripts/release-appstore.sh archives and exports it.
+#include "Base.xcconfig"
+
+CODE_SIGN_ENTITLEMENTS = App/Apen-AppStore.entitlements
+ENABLE_APP_SANDBOX = YES
+ENABLE_HARDENED_RUNTIME = YES
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) APPSTORE
