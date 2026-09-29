@@ -29,7 +29,7 @@ public actor DictationSession {
 
     private let recorder = MicrophoneRecorder()
     private let fileFeeder = FileAudioFeeder()
-    private let transcriber: LiveTranscriber
+    private nonisolated let transcriber: LiveTranscriber
     private let recordingURL: URL?
     private var consumer: Task<Void, Error>?
     private var interruptionWatcher: Task<Void, Never>?
@@ -53,6 +53,9 @@ public actor DictationSession {
 
     /// Seconds captured so far; callable from any thread.
     public nonisolated var capturedSeconds: Double { recorder.capturedSeconds + fileFeeder.capturedSeconds }
+
+    /// Seconds already transcribed; with `capturedSeconds` this gives the catch-up percentage.
+    public nonisolated var transcribedSeconds: Double { transcriber.transcribedSeconds }
 
     public func start(deviceUID: String?) async throws -> StartInfo {
         try await start(source: .microphone(deviceUID: deviceUID))

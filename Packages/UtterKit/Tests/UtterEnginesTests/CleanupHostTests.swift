@@ -56,3 +56,36 @@ struct CleanupHostTests {
         #expect(elapsed < .seconds(1))
     }
 }
+
+@Suite(.enabled(if: Fixtures.isEnabled && CleanupModel.isDownloaded, "Needs UTTER_INTEGRATION=1 and the cleanup model"), .serialized)
+struct CleanupEngineTests {
+    let engine = CleanupEngine(host: CleanupHost(helperExecutable: CleanupHostTests.helper))
+
+    @Test("Removes fillers and keeps the meaning")
+    func fillers() async throws {
+        let raw = try Fixtures.reference("ramble")
+        let result = await engine.clean(raw, keepVerbatim: [], extraInstructions: nil)
+        print("cleanup ramble: \(result.text)")
+        #expect(result.piecesCleaned == 1)
+        let lower = result.text.lowercased()
+        #expect(!lower.contains(" um ") && !lower.contains(" uh "))
+        #expect(lower.contains("login") && lower.contains("slow"))
+    }
+
+    @Test("An instruction-shaped dictation stays an instruction")
+    func instructionIsNotAnswered() async throws {
+        let raw = "um so can you uh write me a python function that like reverses a string and uh make it handle unicode"
+        let result = await engine.clean(raw, keepVerbatim: [], extraInstructions: nil)
+        print("cleanup instruction: \(result.text)")
+        #expect(!result.text.contains("def "), "the model answered instead of cleaning")
+        #expect(result.text.lowercased().contains("python function"))
+    }
+
+    @Test("Keeps dictionary terms verbatim")
+    func keepsTerms() async throws {
+        let raw = "so the RLS policy on BPC is uh blocking the PR"
+        let result = await engine.clean(raw, keepVerbatim: ["RLS", "BPC", "PR"], extraInstructions: nil)
+        print("cleanup terms: \(result.text)")
+        for term in ["RLS", "BPC", "PR"] { #expect(result.text.contains(term)) }
+    }
+}

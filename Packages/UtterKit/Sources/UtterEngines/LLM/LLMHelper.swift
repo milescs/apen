@@ -14,6 +14,8 @@ public enum LLMHelper {
         let messages: [Message]
         let maxTokens: Int
         let timeoutSeconds: Double?
+        /// Typical output length, used only to report progress.
+        var expectedTokens: Int?
     }
 
     struct Message: Codable {
@@ -26,6 +28,8 @@ public enum LLMHelper {
         var id: Int?
         var text: String?
         var error: String?
+        /// 0…1 while generating (estimated from `expectedTokens`).
+        var progress: Double?
     }
 
     /// For synchronous `main.swift` entry points: runs the helper and exits the process; never returns.
@@ -60,11 +64,16 @@ public enum LLMHelper {
             }
             let deadline = request.timeoutSeconds.map { ContinuousClock.now + .seconds($0) }
             do {
+                let expected = max(request.expectedTokens ?? request.maxTokens, 1)
                 let text = try await runtime.generate(
                     messages: request.messages.map { LlamaRuntime.Message(role: $0.role, content: $0.content) },
                     maxTokens: request.maxTokens,
                     deadline: deadline
-                )
+                ) { generated in
+                    if generated % 8 == 0 {
+                        send(Response(id: request.id, progress: min(Double(generated) / Double(expected), 0.99)))
+                    }
+                }
                 send(Response(id: request.id, text: text))
             } catch {
                 send(Response(id: request.id, error: error.localizedDescription))

@@ -1,4 +1,5 @@
 import SwiftUI
+import UtterCore
 
 struct HUDView: View {
     let model: AppModel
@@ -17,9 +18,16 @@ struct HUDView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             case .processing:
-                StatusRow(symbol: nil, text: "Transcribing…")
+                TimelineView(.periodic(from: .now, by: 0.1)) { _ in
+                    StatusRow(title: "Transcribing", progress: model.transcriptionProgress(), mode: model.activeMode)
+                }
             case .cleaning:
-                StatusRow(symbol: nil, text: "Cleaning up…  ⌥Space pastes it as is")
+                StatusRow(
+                    title: "Cleaning up",
+                    progress: model.cleanupProgress,
+                    mode: model.activeMode,
+                    hint: "⌥Space pastes it as is"
+                )
             case .idle:
                 EmptyView()
             }
@@ -60,15 +68,25 @@ private struct RecordingRow: View {
             }
             LevelMeter(model: model)
                 .frame(height: 22)
-            VStack(alignment: .leading, spacing: 0) {
-                Text(model.deviceName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                if !model.isModelReady {
-                    Text("Preparing model…")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+            VStack(alignment: .leading, spacing: 1) {
+                ModeChip(mode: model.activeMode, automatic: model.activeModeIsAutomatic)
+                TimelineView(.periodic(from: .now, by: 0.25)) { context in
+                    if let loading = model.modelLoadProgress(at: context.date) {
+                        Text("Loading model \(Int(loading * 100))%")
+                            .font(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    } else if let progress = model.transcriptionProgress(), progress < 0.85 {
+                        Text("Catching up \(Int(progress * 100))%")
+                            .font(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text(model.deviceName)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
             }
             Spacer(minLength: 4)
@@ -79,15 +97,44 @@ private struct RecordingRow: View {
 }
 
 private struct StatusRow: View {
-    let symbol: String?
-    let text: String
+    let title: String
+    let progress: Double?
+    let mode: DictationMode
+    var hint: String?
 
     var body: some View {
-        HStack(spacing: 10) {
-            ProgressView().controlSize(.small)
-            Text(text).font(.callout)
-            Spacer()
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
+                Text(progress.map { "\(title) \(Int($0 * 100))%" } ?? "\(title)…")
+                    .font(.callout)
+                    .monospacedDigit()
+                Spacer()
+                ModeChip(mode: mode, automatic: false)
+            }
+            if let progress {
+                ProgressView(value: progress)
+                    .progressViewStyle(.linear)
+                    .controlSize(.small)
+            } else {
+                ProgressView().progressViewStyle(.linear).controlSize(.small)
+            }
+            if let hint {
+                Text(hint).font(.caption2).foregroundStyle(.secondary)
+            }
         }
+    }
+}
+
+private struct ModeChip: View {
+    let mode: DictationMode
+    let automatic: Bool
+
+    var body: some View {
+        Label(automatic ? "\(mode.name) · auto" : mode.name, systemImage: mode.symbol)
+            .font(.caption2.weight(.medium))
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .help(automatic ? "Chosen automatically for this app" : mode.summary)
     }
 }
 

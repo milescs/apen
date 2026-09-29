@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import UtterCore
 
 /// User preferences, persisted in UserDefaults.
 @MainActor
@@ -19,6 +20,11 @@ final class AppSettings {
         static let keepRecordings = "keepRecordings"
         static let historyRetentionDays = "historyRetentionDays"
         static let hudOrigin = "hudOrigin"
+        static let selectedModeID = "selectedModeID"
+        static let modeApps = "modeApps"
+        static let modeInstructions = "modeInstructions"
+        static let warmLoadSeconds = "warmLoadSeconds"
+        static let coldLoadSeconds = "coldLoadSeconds"
     }
 
     @ObservationIgnored private let defaults: UserDefaults
@@ -48,6 +54,27 @@ final class AppSettings {
         }
     }
 
+    /// The mode used when the app you dictate into has no mode of its own.
+    var selectedModeID: String { didSet { defaults.set(selectedModeID, forKey: Key.selectedModeID) } }
+    /// Per-mode app lists edited by the user (mode id → bundle ids). Missing = the mode's defaults.
+    var modeApps: [String: [String]] { didSet { defaults.set(modeApps, forKey: Key.modeApps) } }
+    /// Per-mode extra cleanup instructions (mode id → text).
+    var modeInstructions: [String: String] { didSet { defaults.set(modeInstructions, forKey: Key.modeInstructions) } }
+    /// Measured speech-model load times, used to estimate the "Loading model N%" indicator.
+    var warmLoadSeconds: Double { didSet { defaults.set(warmLoadSeconds, forKey: Key.warmLoadSeconds) } }
+    var coldLoadSeconds: Double { didSet { defaults.set(coldLoadSeconds, forKey: Key.coldLoadSeconds) } }
+
+    func apps(for mode: DictationMode) -> [String] {
+        modeApps[mode.id] ?? mode.defaultApps
+    }
+
+    func instructions(for mode: DictationMode) -> String? {
+        let parts = [cleanupInstructions, modeInstructions[mode.id] ?? ""]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return parts.isEmpty ? nil : parts.joined(separator: "\n")
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         defaults.register(defaults: [
@@ -61,6 +88,9 @@ final class AppSettings {
             Key.maxRecordingMinutes: 60,
             Key.keepRecordings: false,
             Key.historyRetentionDays: 0,
+            Key.selectedModeID: DictationMode.defaultModeID,
+            Key.warmLoadSeconds: 0.5,
+            Key.coldLoadSeconds: 20.0,
         ])
         microphoneUID = defaults.string(forKey: Key.microphoneUID)
         autoPaste = defaults.bool(forKey: Key.autoPaste)
@@ -74,6 +104,11 @@ final class AppSettings {
         maxRecordingMinutes = max(1, defaults.integer(forKey: Key.maxRecordingMinutes))
         keepRecordings = defaults.bool(forKey: Key.keepRecordings)
         historyRetentionDays = defaults.integer(forKey: Key.historyRetentionDays)
+        selectedModeID = defaults.string(forKey: Key.selectedModeID) ?? DictationMode.defaultModeID
+        modeApps = defaults.dictionary(forKey: Key.modeApps) as? [String: [String]] ?? [:]
+        modeInstructions = defaults.dictionary(forKey: Key.modeInstructions) as? [String: String] ?? [:]
+        warmLoadSeconds = defaults.double(forKey: Key.warmLoadSeconds)
+        coldLoadSeconds = defaults.double(forKey: Key.coldLoadSeconds)
         if let pair = defaults.array(forKey: Key.hudOrigin) as? [Double], pair.count == 2 {
             hudOrigin = CGPoint(x: pair[0], y: pair[1])
         } else {

@@ -4,15 +4,15 @@ import SwiftUI
 
 struct UtterApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @State private var isMenuPresented = false
 
     var body: some Scene {
+        @Bindable var model = appDelegate.model
         MenuBarExtra {
-            MenuBarView(model: appDelegate.model, isPresented: $isMenuPresented)
+            MenuBarView(model: model, isPresented: $model.isMenuPresented)
         } label: {
-            MenuBarLabel(model: appDelegate.model)
+            MenuBarLabel(model: model)
         }
-        .menuBarExtraAccess(isPresented: $isMenuPresented)
+        .menuBarExtraAccess(isPresented: $model.isMenuPresented)
         .menuBarExtraStyle(.window)
     }
 }

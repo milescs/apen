@@ -69,7 +69,12 @@ public actor LlamaRuntime {
     }
 
     /// Greedy completion of a chat. Stops at end-of-generation, `maxTokens`, `deadline` or task cancellation.
-    public func generate(messages: [Message], maxTokens: Int, deadline: ContinuousClock.Instant? = nil) throws -> String {
+    public func generate(
+        messages: [Message],
+        maxTokens: Int,
+        deadline: ContinuousClock.Instant? = nil,
+        onToken: ((Int) -> Void)? = nil
+    ) throws -> String {
         guard let handles else { throw LlamaError.notLoaded }
         let (model, context, sampler, vocab) = (handles.model, handles.context, handles.sampler, handles.vocab)
 
@@ -91,8 +96,9 @@ public actor LlamaRuntime {
         var output: [UInt8] = []
         var pieceBuffer = [CChar](repeating: 0, count: 256)
         let clock = ContinuousClock()
-        for _ in 0..<maxTokens {
+        for generated in 0..<maxTokens {
             if Task.isCancelled { throw CancellationError() }
+            onToken?(generated)
             if let deadline, clock.now >= deadline { throw LlamaError.timedOut }
 
             var token = llama_sampler_sample(sampler, context, -1)

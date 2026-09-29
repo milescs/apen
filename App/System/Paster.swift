@@ -26,6 +26,7 @@ final class Paster {
             return .copiedOnly(reason: "auto-paste is off")
         }
         guard Permissions.canPostEvents else {
+            Log.paste.notice("No PostEvent access; copied instead of pasting")
             write(text, to: pasteboard)
             return .copiedOnly(reason: "allow Utter under Accessibility to paste automatically")
         }
@@ -35,14 +36,20 @@ final class Paster {
         let ourChangeCount = pasteboard.changeCount
 
         try? await Task.sleep(for: .milliseconds(60))
+        let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "none"
+        Log.paste.notice("Posting ⌘V to \(frontmost, privacy: .public); restore: \(snapshot != nil)")
         Self.postCommandV()
 
         if let snapshot {
             restoreTask = Task {
                 // Slow targets (Electron, remote desktops) read the clipboard lazily after ⌘V.
                 try? await Task.sleep(for: .milliseconds(1_200))
-                guard !Task.isCancelled, pasteboard.changeCount == ourChangeCount else { return }
+                guard !Task.isCancelled, pasteboard.changeCount == ourChangeCount else {
+                    Log.paste.notice("Clipboard changed since paste; not restoring")
+                    return
+                }
                 Self.restore(snapshot, to: pasteboard)
+                Log.paste.notice("Clipboard restored")
             }
         }
         return .pasted

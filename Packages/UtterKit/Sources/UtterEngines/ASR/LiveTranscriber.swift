@@ -1,6 +1,7 @@
 @preconcurrency import AVFoundation
 import FluidAudio
 import Foundation
+import Synchronization
 
 /// One transcription session: feed 16 kHz mono audio as it arrives, then `finish()`.
 ///
@@ -21,6 +22,13 @@ public actor LiveTranscriber {
 
     /// Running transcript, published after each processing step while audio streams in.
     public nonisolated let partials: AsyncStream<String>
+
+    private nonisolated let transcribedSamples = Atomic<Int>(0)
+
+    /// Seconds of audio already run through the model; callable from any thread (drives "Transcribing N%").
+    public nonisolated var transcribedSeconds: Double {
+        Double(transcribedSamples.load(ordering: .relaxed)) / Self.sampleRate
+    }
 
     public init(host: SpeechModelHost = .shared, gate: CoreMLGate = .shared, boostTerms: [BoostTerm] = []) {
         self.host = host
@@ -61,6 +69,7 @@ public actor LiveTranscriber {
             await gate.release()
             throw error
         }
+        transcribedSamples.add(samples.count, ordering: .relaxed)
         let partial = await manager.getPartialTranscript()
         if partial != lastPartial {
             lastPartial = partial

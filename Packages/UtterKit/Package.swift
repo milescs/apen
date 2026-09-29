@@ -32,7 +32,10 @@ let package = Package(
             ]
         ),
         .executableTarget(name: "utter-cli", dependencies: ["UtterEngines"]),
-        .testTarget(name: "UtterCoreTests", dependencies: ["UtterCore"]),
+        .testTarget(
+            name: "UtterCoreTests",
+            dependencies: ["UtterCore", .product(name: "GRDB", package: "GRDB.swift")]
+        ),
         .testTarget(name: "UtterEnginesTests", dependencies: ["UtterEngines"]),
     ]
 )

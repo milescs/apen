@@ -63,10 +63,19 @@ public actor CleanupHost {
     }
 
     /// Greedy completion in the helper.
-    public func generate(messages: [LlamaRuntime.Message], maxTokens: Int, timeout: Duration) async throws -> String {
+    public func generate(
+        messages: [LlamaRuntime.Message],
+        maxTokens: Int,
+        expectedTokens: Int? = nil,
+        timeout: Duration,
+        progress: (@Sendable (Double) -> Void)? = nil
+    ) async throws -> String {
         let helper = try await runningHelper()
         let seconds = Double(timeout.components.seconds) + Double(timeout.components.attoseconds) / 1e18
-        return try await helper.generate(messages: messages, maxTokens: maxTokens, timeoutSeconds: seconds)
+        return try await helper.generate(
+            messages: messages, maxTokens: maxTokens, expectedTokens: expectedTokens,
+            timeoutSeconds: seconds, progress: progress
+        )
     }
 
     /// Kills the helper so an in-flight generation fails right away (the next request restarts it).
@@ -158,7 +167,13 @@ final class HelperProcess: @unchecked Sendable {
         return helper
     }
 
-    func generate(messages: [LlamaRuntime.Message], maxTokens: Int, timeoutSeconds: Double) async throws -> String {
+    func generate(
+        messages: [LlamaRuntime.Message],
+        maxTokens: Int,
+        expectedTokens: Int?,
+        timeoutSeconds: Double,
+        progress: (@Sendable (Double) -> Void)?
+    ) async throws -> String {
         let id = lock.withLock {
             nextID += 1
             return nextID
@@ -167,7 +182,8 @@ final class HelperProcess: @unchecked Sendable {
             id: id,
             messages: messages.map { LLMHelper.Message(role: $0.role, content: $0.content) },
             maxTokens: maxTokens,
-            timeoutSeconds: timeoutSeconds
+            timeoutSeconds: timeoutSeconds,
+            expectedTokens: expectedTokens
         )
         var data = try JSONEncoder().encode(request)
         data.append(0x0A)
@@ -180,6 +196,10 @@ final class HelperProcess: @unchecked Sendable {
             guard let response = try? JSONDecoder().decode(LLMHelper.Response.self, from: Data(line.utf8)),
                 response.id == id
             else { continue }
+            if let fraction = response.progress {
+                progress?(fraction)
+                continue
+            }
             if let text = response.text { return text }
             throw CleanupEngineError.helperFailed(response.error ?? "no output")
         }
