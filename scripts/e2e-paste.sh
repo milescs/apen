@@ -13,13 +13,15 @@ EXPECT="${2:-RLS policy}"
 SENTINEL="apen-e2e-sentinel-$RANDOM"
 
 [[ -f "$FIXTURE" ]] || { echo "missing fixture $FIXTURE (run make fixtures)"; exit 1; }
-pgrep -x Apen >/dev/null || { echo "Apen isn't running (make run)"; exit 1; }
+APP="${APEN_APP:-$PWD/build/DerivedData/Build/Products/Debug/Apen.app}"
+pgrep -f "$APP/Contents/MacOS/Apen" >/dev/null || { echo "The Debug build isn't running (make run)"; exit 1; }
 
 printf '%s' "$SENTINEL" | pbcopy
 osascript -e 'tell application "TextEdit" to activate' -e 'tell application "TextEdit" to make new document' >/dev/null
 sleep 1
 
-open -g "apen://debug/dictate?file=${FIXTURE}&speed=4"
+# Send the URL to the Debug build explicitly; the Release app in /Applications ignores debug commands.
+open -g -a "$APP" "apen://debug/dictate?file=${FIXTURE}&speed=4"
 
 text=""
 for _ in $(seq 1 60); do

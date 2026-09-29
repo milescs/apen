@@ -15,10 +15,15 @@ struct OnboardingView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Welcome to Apen").font(.largeTitle.bold())
-                    Text("Dictate anywhere with ⌥Space. Everything runs on this Mac with open-weight models.")
-                        .foregroundStyle(.secondary)
+                HStack(spacing: 16) {
+                    Image(nsImage: NSApp.applicationIconImage)
+                        .resizable()
+                        .frame(width: 64, height: 64)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Welcome to Apen").font(.largeTitle.bold())
+                        Text("Dictate anywhere with ⌥Space. Everything runs on this Mac with open-weight models.")
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Step(number: 1, title: "Microphone", done: hasMicrophone) {

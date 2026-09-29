@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct AboutView: View {
@@ -9,8 +10,10 @@ struct AboutView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    Image(systemName: "waveform").font(.system(size: 36))
+                HStack(spacing: 14) {
+                    Image(nsImage: NSApp.applicationIconImage)
+                        .resizable()
+                        .frame(width: 72, height: 72)
                     VStack(alignment: .leading) {
                         Text("Apen").font(.title.bold())
                         Text("Version \(version)").foregroundStyle(.secondary)

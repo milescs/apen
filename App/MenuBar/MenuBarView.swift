@@ -3,19 +3,29 @@ import SwiftUI
 import ApenCore
 import ApenEngines
 
+/// The "A" with an aspen leaf; sound waves while recording, dots while transcribing or cleaning up.
 struct MenuBarLabel: View {
     let model: AppModel
 
     var body: some View {
-        Image(systemName: symbol)
-            .accessibilityLabel("Apen")
+        Image(imageName)
+            .renderingMode(.template)
+            .accessibilityLabel(accessibilityText)
     }
 
-    private var symbol: String {
+    private var imageName: String {
         switch model.phase {
-        case .idle: "waveform"
-        case .recording: "waveform.circle.fill"
-        case .processing, .cleaning: "ellipsis.circle"
+        case .idle: "MenuBarIdle"
+        case .recording: "MenuBarRecording"
+        case .processing, .cleaning: "MenuBarBusy"
+        }
+    }
+
+    private var accessibilityText: String {
+        switch model.phase {
+        case .idle: "Apen"
+        case .recording: "Apen, recording"
+        case .processing, .cleaning: "Apen, transcribing"
         }
     }
 }
