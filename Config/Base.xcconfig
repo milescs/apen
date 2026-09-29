@@ -1,11 +1,11 @@
-// Shared build settings for the Utter app target.
+// Shared build settings for the Apen app target.
 MACOSX_DEPLOYMENT_TARGET = 26.0
 SWIFT_VERSION = 6.0
 SWIFT_STRICT_CONCURRENCY = complete
 ENABLE_HARDENED_RUNTIME = YES
 ENABLE_APP_SANDBOX = NO
-CODE_SIGN_ENTITLEMENTS = App/Utter.entitlements
-PRODUCT_BUNDLE_IDENTIFIER = com.milescs.utter
+CODE_SIGN_ENTITLEMENTS = App/Apen.entitlements
+PRODUCT_BUNDLE_IDENTIFIER = com.milescs.apen
 MARKETING_VERSION = 0.1.0
 CURRENT_PROJECT_VERSION = 1
 

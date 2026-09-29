@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Opens Utter's regular windows (History, Dictionary, Settings, …) from a menu-bar-only app.
+/// Opens Apen's regular windows (History, Dictionary, Settings, …) from a menu-bar-only app.
 ///
 /// While any window is open the app switches to the `.regular` activation policy so windows come to the
 /// front and appear in ⌘Tab; when the last one closes it goes back to `.accessory` (menu bar only).
@@ -12,12 +12,12 @@ final class WindowCoordinator: NSObject, NSWindowDelegate {
 
         var title: String {
             switch self {
-            case .history: "Utter History"
-            case .dictionary: "Utter Dictionary"
-            case .settings: "Utter Settings"
+            case .history: "Apen History"
+            case .dictionary: "Apen Dictionary"
+            case .settings: "Apen Settings"
             case .fileTranscription: "Transcribe a File"
-            case .onboarding: "Welcome to Utter"
-            case .about: "About Utter"
+            case .onboarding: "Welcome to Apen"
+            case .about: "About Apen"
             }
         }
 
@@ -47,7 +47,7 @@ final class WindowCoordinator: NSObject, NSWindowDelegate {
         windows[kind]?.close()
     }
 
-    /// True when one of Utter's own windows (not the menu popover or HUD) has keyboard focus.
+    /// True when one of Apen's own windows (not the menu popover or HUD) has keyboard focus.
     var hasKeyWindow: Bool {
         windows.values.contains { $0.isKeyWindow }
     }
@@ -68,8 +68,8 @@ final class WindowCoordinator: NSObject, NSWindowDelegate {
         window.setContentSize(kind.defaultSize)
         window.isReleasedWhenClosed = false
         window.delegate = self
-        window.setFrameAutosaveName("Utter.\(kind.rawValue)")
-        if !window.setFrameUsingName("Utter.\(kind.rawValue)") { window.center() }
+        window.setFrameAutosaveName("Apen.\(kind.rawValue)")
+        if !window.setFrameUsingName("Apen.\(kind.rawValue)") { window.center() }
         windows[kind] = window
         return window
     }

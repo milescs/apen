@@ -1,8 +1,8 @@
 import AppKit
 import KeyboardShortcuts
 import Observation
-import UtterCore
-import UtterEngines
+import ApenCore
+import ApenEngines
 
 /// Root controller: turns hotkey presses into dictation sessions, runs the text pipeline
 /// (dictionary → optional cleanup → dictionary), delivers the result and saves it to History.
@@ -69,7 +69,7 @@ final class AppModel {
 
     static let supportDirectory: URL = {
         let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Utter", isDirectory: true)
+            .appendingPathComponent("Apen", isDirectory: true)
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return url
     }()
@@ -80,7 +80,7 @@ final class AppModel {
         var databaseError: String?
         var database: AppDatabase?
         do {
-            database = try AppDatabase(fileURL: Self.supportDirectory.appendingPathComponent("utter.sqlite"))
+            database = try AppDatabase(fileURL: Self.supportDirectory.appendingPathComponent("apen.sqlite"))
         } catch {
             databaseError = error.localizedDescription
         }
@@ -137,7 +137,7 @@ final class AppModel {
 
     func open(_ url: URL) {
         #if DEBUG
-        if url.scheme == "utter", url.host == "debug" {
+        if url.scheme == "apen", url.host == "debug" {
             handleDebugURL(url)
             return
         }
@@ -149,7 +149,7 @@ final class AppModel {
     }
 
     #if DEBUG
-    /// `utter://debug/dictate?file=/path/to/audio.wav&speed=4` runs a full dictation with the file standing in
+    /// `apen://debug/dictate?file=/path/to/audio.wav&speed=4` runs a full dictation with the file standing in
     /// for the microphone, then pastes into the frontmost app. Used by scripts/e2e-paste.sh.
     private func handleDebugURL(_ url: URL) {
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
@@ -289,13 +289,13 @@ final class AppModel {
     private func startRecording() async {
         guard SpeechModel.isDownloaded else {
             showOnboarding()
-            return abortStart("Download the speech model first (Utter › Settings › Models).")
+            return abortStart("Download the speech model first (Apen › Settings › Models).")
         }
         let source = pendingSource ?? .microphone(deviceUID: settings.microphoneUID)
         pendingSource = nil
         if case .microphone = source, await !Permissions.requestMicrophone() {
             Permissions.openMicrophoneSettings()
-            return abortStart("Utter needs microphone access. Enable it in System Settings › Privacy & Security › Microphone.")
+            return abortStart("Apen needs microphone access. Enable it in System Settings › Privacy & Security › Microphone.")
         }
 
         skipPaste = false
@@ -659,7 +659,7 @@ final class AppModel {
                     finalText: "",
                     asrModel: SpeechModel.displayName,
                     status: .failed,
-                    error: "Utter quit before this dictation was transcribed. Use Retry to transcribe the saved audio.",
+                    error: "Apen quit before this dictation was transcribed. Use Retry to transcribe the saved audio.",
                     audioPath: file.path
                 )
             )
@@ -692,7 +692,7 @@ final class AppModel {
         defaultInputName = AudioInputDevices.defaultInput()?.name ?? "Default input"
     }
 
-    /// Remembers the last app that wasn't Utter, so a dictation started from the menu can paste back into it.
+    /// Remembers the last app that wasn't Apen, so a dictation started from the menu can paste back into it.
     private func trackFrontmostApp() {
         if let app = NSWorkspace.shared.frontmostApplication, app.bundleIdentifier != Bundle.main.bundleIdentifier {
             lastExternalApp = app
@@ -707,8 +707,8 @@ final class AppModel {
         }
     }
 
-    /// The paste goes to whichever window is selected when the text is ready. The one exception: if Utter is
-    /// only active because its menu-bar popover was used (no Utter window selected), hand focus back to the app
+    /// The paste goes to whichever window is selected when the text is ready. The one exception: if Apen is
+    /// only active because its menu-bar popover was used (no Apen window selected), hand focus back to the app
     /// the user was working in so ⌘V doesn't land nowhere.
     private func returnFocusIfNeeded() async {
         guard NSApp.isActive, !windows.hasKeyWindow, let target = lastExternalApp, !target.isTerminated else { return }

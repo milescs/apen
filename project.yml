@@ -1,4 +1,4 @@
-name: Utter
+name: Apen
 options:
   bundleIdPrefix: com.milescs
   deploymentTarget:
@@ -7,8 +7,8 @@ options:
   developmentLanguage: en
 
 packages:
-  UtterKit:
-    path: Packages/UtterKit
+  ApenKit:
+    path: Packages/ApenKit
   KeyboardShortcuts:
     url: https://github.com/sindresorhus/KeyboardShortcuts
     from: 3.1.0
@@ -17,7 +17,7 @@ packages:
     from: 1.3.1
 
 targets:
-  Utter:
+  Apen:
     type: application
     platform: macOS
     configFiles:
@@ -30,18 +30,18 @@ targets:
     info:
       path: App/Info.plist
       properties:
-        CFBundleName: Utter
-        CFBundleDisplayName: Utter
+        CFBundleName: Apen
+        CFBundleDisplayName: Apen
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.productivity
         LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
-        NSMicrophoneUsageDescription: Utter records your voice while you dictate and transcribes it on this Mac. Audio never leaves your computer.
+        NSMicrophoneUsageDescription: Apen records your voice while you dictate and transcribes it on this Mac. Audio never leaves your computer.
         NSHumanReadableCopyright: Local dictation with open-weight models.
         CFBundleURLTypes:
-          - CFBundleURLName: com.milescs.utter
-            CFBundleURLSchemes: [utter]
+          - CFBundleURLName: com.milescs.apen
+            CFBundleURLSchemes: [apen]
         CFBundleDocumentTypes:
           - CFBundleTypeName: Audio or Video
             CFBundleTypeRole: Viewer
@@ -53,18 +53,18 @@ targets:
         ENABLE_PREVIEWS: YES
         DEAD_CODE_STRIPPING: YES
     dependencies:
-      - package: UtterKit
-        product: UtterCore
-      - package: UtterKit
-        product: UtterEngines
+      - package: ApenKit
+        product: ApenCore
+      - package: ApenKit
+        product: ApenEngines
       - package: KeyboardShortcuts
       - package: MenuBarExtraAccess
 
 schemes:
-  Utter:
+  Apen:
     build:
       targets:
-        Utter: all
+        Apen: all
     run:
       config: Debug
     archive:

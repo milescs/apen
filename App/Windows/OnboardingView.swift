@@ -1,7 +1,7 @@
 import AppKit
 import KeyboardShortcuts
 import SwiftUI
-import UtterEngines
+import ApenEngines
 
 /// First-run checklist: permissions, models, shortcut, and a place to try it.
 struct OnboardingView: View {
@@ -16,13 +16,13 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Welcome to Utter").font(.largeTitle.bold())
+                    Text("Welcome to Apen").font(.largeTitle.bold())
                     Text("Dictate anywhere with ⌥Space. Everything runs on this Mac with open-weight models.")
                         .foregroundStyle(.secondary)
                 }
 
                 Step(number: 1, title: "Microphone", done: hasMicrophone) {
-                    Text("Utter only listens while you dictate.")
+                    Text("Apen only listens while you dictate.")
                     if !hasMicrophone {
                         Button("Allow Microphone") {
                             Task {
@@ -34,7 +34,7 @@ struct OnboardingView: View {
                 }
 
                 Step(number: 2, title: "Accessibility (to paste for you)", done: canPaste) {
-                    Text("Lets Utter press ⌘V in the app you're typing in. Turn Utter on under Privacy & Security › Accessibility.")
+                    Text("Lets Apen press ⌘V in the app you're typing in. Turn Apen on under Privacy & Security › Accessibility.")
                     if !canPaste {
                         Button("Open Accessibility Settings") { Permissions.requestPostEvents() }
                     }
@@ -62,7 +62,7 @@ struct OnboardingView: View {
                             Button("Quit Superwhisper") { quitSuperwhisper() }
                         }
                     }
-                    Toggle("Open Utter at login", isOn: $launchAtLogin)
+                    Toggle("Open Apen at login", isOn: $launchAtLogin)
                         .onChange(of: launchAtLogin) { _, enabled in
                             try? LoginItem.set(enabled)
                             launchAtLogin = LoginItem.isEnabled

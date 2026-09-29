@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
-import UtterCore
+import ApenCore
 
 /// Personal dictionary: "When I say X, write Y", with a live preview.
 struct DictionaryView: View {
@@ -137,7 +137,7 @@ struct DictionaryView: View {
     private func exportEntries() {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
-        panel.nameFieldStringValue = "Utter Dictionary.json"
+        panel.nameFieldStringValue = "Apen Dictionary.json"
         guard panel.runModal() == .OK, let url = panel.url else { return }
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

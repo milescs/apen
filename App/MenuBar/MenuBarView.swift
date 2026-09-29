@@ -1,14 +1,14 @@
 import KeyboardShortcuts
 import SwiftUI
-import UtterCore
-import UtterEngines
+import ApenCore
+import ApenEngines
 
 struct MenuBarLabel: View {
     let model: AppModel
 
     var body: some View {
         Image(systemName: symbol)
-            .accessibilityLabel("Utter")
+            .accessibilityLabel("Apen")
     }
 
     private var symbol: String {
@@ -51,7 +51,7 @@ struct MenuBarView: View {
 
     private var header: some View {
         HStack {
-            Text("Utter").font(.headline)
+            Text("Apen").font(.headline)
             Spacer()
             Text(statusText)
                 .font(.caption)

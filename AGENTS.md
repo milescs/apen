@@ -1,6 +1,6 @@
-# Utter — agent guide
+# Apen — agent guide
 
-Utter is a personal, fully local macOS menu-bar dictation app (a Superwhisper replacement). Speech is transcribed
+Apen is a personal, fully local macOS menu-bar dictation app (a Superwhisper replacement). Speech is transcribed
 on-device by NVIDIA Parakeet Unified EN (via FluidAudio, Core ML / Neural Engine); an optional cleanup pass uses
 Qwen3-4B-Instruct-2507 through llama.cpp. English only.
 
@@ -13,7 +13,7 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
   folders). Keep the attributions in `LICENSES/` and the About window accurate.
 - **Models occupy memory only while working.** Speech and cleanup models load at the start of a recording or file job
   and are released when it ends (`SpeechModelHost`, `ModelLifecycle`). Don't add long-lived model references.
-- **Never lose a dictation.** Audio is written to `~/Library/Application Support/Utter/Recordings/` while recording and
+- **Never lose a dictation.** Audio is written to `~/Library/Application Support/Apen/Recordings/` while recording and
   deleted only after the transcript is saved (unless the user keeps recordings).
 - **Privacy.** Don't log transcripts. `EngineLogging.quiet()` keeps FluidAudio's debug text out of the system log.
 
@@ -23,9 +23,9 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
 | --- | --- |
 | `project.yml` | XcodeGen spec (the `.xcodeproj` is generated and gitignored) |
 | `App/` | App target: SwiftUI + AppKit glue (menu bar, HUD, hotkeys, paste, windows) |
-| `Packages/UtterKit/Sources/UtterCore` | Pure logic + GRDB stores (dictionary matcher, trigger state machine, text utilities, cleanup prompt/guard) |
-| `Packages/UtterKit/Sources/UtterEngines` | FluidAudio + llama.cpp: audio capture/decoding, live transcription, model management, cleanup runtime |
-| `Packages/UtterKit/Sources/utter-cli` | `utter` CLI: model downloads, headless transcription, memory measurements |
+| `Packages/ApenKit/Sources/ApenCore` | Pure logic + GRDB stores (dictionary matcher, trigger state machine, text utilities, cleanup prompt/guard) |
+| `Packages/ApenKit/Sources/ApenEngines` | FluidAudio + llama.cpp: audio capture/decoding, live transcription, model management, cleanup runtime |
+| `Packages/ApenKit/Sources/apen-cli` | `apen` CLI: model downloads, headless transcription, memory measurements |
 | `Fixtures/` | `make-fixtures.sh` (speech fixtures via `say`); `Fixtures/real/` holds personal recordings (gitignored) |
 
 ## Commands
@@ -37,7 +37,7 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
 | Model-backed tests | `make integration` |
 | Build + run (Debug) | `make run` |
 | Install to /Applications | `make install` |
-| Transcribe a file headlessly | `cd Packages/UtterKit && swift run utter transcribe <file> --memory` |
+| Transcribe a file headlessly | `cd Packages/ApenKit && swift run apen transcribe <file> --memory` |
 | Reset permissions | `make reset-tcc` |
 
 ## Conventions
@@ -47,4 +47,4 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
   (a main-actor closure on the audio thread traps at runtime).
 - All Core ML calls go through `CoreMLGate` (concurrent FluidAudio managers can crash).
 - FluidAudio's README/API docs are stale; read the source at the pinned tag in `.build/checkouts/FluidAudio`.
-- Behavior changes ship with tests next to the code (`Tests/UtterCoreTests`, `Tests/UtterEnginesTests`).
+- Behavior changes ship with tests next to the code (`Tests/ApenCoreTests`, `Tests/ApenEnginesTests`).

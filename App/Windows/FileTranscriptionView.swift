@@ -1,8 +1,8 @@
 import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
-import UtterCore
-import UtterEngines
+import ApenCore
+import ApenEngines
 
 /// Runs file transcriptions and keeps the latest result for the window.
 @MainActor

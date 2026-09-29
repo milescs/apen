@@ -1,5 +1,5 @@
 import SwiftUI
-import UtterCore
+import ApenCore
 
 /// Searchable list of saved transcriptions with a detail pane.
 struct HistoryView: View {

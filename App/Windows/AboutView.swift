@@ -12,7 +12,7 @@ struct AboutView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "waveform").font(.system(size: 36))
                     VStack(alignment: .leading) {
-                        Text("Utter").font(.title.bold())
+                        Text("Apen").font(.title.bold())
                         Text("Version \(version)").foregroundStyle(.secondary)
                     }
                 }

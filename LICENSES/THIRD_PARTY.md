@@ -1,6 +1,6 @@
 # Third-party software and models
 
-Utter's own code is personal software. It bundles or downloads the following:
+Apen's own code is personal software. It bundles or downloads the following:
 
 ## Models (downloaded on first use)
 

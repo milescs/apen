@@ -2,7 +2,7 @@
 import AppKit
 import SwiftUI
 
-/// `utter://debug/snapshot?dir=…` renders Utter's own visible windows (menu popover, HUD, windows) to PNGs
+/// `apen://debug/snapshot?dir=…` renders Apen's own visible windows (menu popover, HUD, windows) to PNGs
 /// for layout review. Draws in-process, so it needs no screen-recording permission.
 @MainActor
 enum DebugSnapshots {

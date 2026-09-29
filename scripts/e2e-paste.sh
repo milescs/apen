@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 # End-to-end check of the dictation → paste path without a microphone:
-# plays a fixture into Utter as if it were the mic, lets Utter paste into a new TextEdit document,
+# plays a fixture into Apen as if it were the mic, lets Apen paste into a new TextEdit document,
 # then reads the document back and checks the clipboard was restored.
 #
-# Needs a Debug build running (make run) with Accessibility allowed for Utter, and lets this terminal
+# Needs a Debug build running (make run) with Accessibility allowed for Apen, and lets this terminal
 # control TextEdit (macOS asks once).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 FIXTURE="${1:-$PWD/Fixtures/generated/acronyms.wav}"
 EXPECT="${2:-RLS policy}"
-SENTINEL="utter-e2e-sentinel-$RANDOM"
+SENTINEL="apen-e2e-sentinel-$RANDOM"
 
 [[ -f "$FIXTURE" ]] || { echo "missing fixture $FIXTURE (run make fixtures)"; exit 1; }
-pgrep -x Utter >/dev/null || { echo "Utter isn't running (make run)"; exit 1; }
+pgrep -x Apen >/dev/null || { echo "Apen isn't running (make run)"; exit 1; }
 
 printf '%s' "$SENTINEL" | pbcopy
 osascript -e 'tell application "TextEdit" to activate' -e 'tell application "TextEdit" to make new document' >/dev/null
 sleep 1
 
-open -g "utter://debug/dictate?file=${FIXTURE}&speed=4"
+open -g "apen://debug/dictate?file=${FIXTURE}&speed=4"
 
 text=""
 for _ in $(seq 1 60); do

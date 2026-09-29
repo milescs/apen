@@ -1,7 +1,7 @@
 import KeyboardShortcuts
 import SwiftUI
-import UtterCore
-import UtterEngines
+import ApenCore
+import ApenEngines
 
 struct SettingsView: View {
     let model: AppModel
@@ -71,7 +71,7 @@ private struct GeneralSettings: View {
                     .help("Recordings are always kept when a transcription fails, so it can be retried")
             }
             Section {
-                Toggle("Open Utter at login", isOn: $launchAtLogin)
+                Toggle("Open Apen at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in
                         do {
                             try LoginItem.set(enabled)
