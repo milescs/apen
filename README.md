@@ -45,58 +45,60 @@ Screenshots use demo data (a Debug build started with `--demo`).
 
 ## Install
 
-Apen is built from source on your Mac (a few minutes, mostly downloading packages), then installed as a normal app in
-`/Applications`. There's no prebuilt download yet, because distributing one requires Apple notarization.
+You need a Mac with **Apple silicon** (M1 or later) running **macOS 26 Tahoe** or later, and about **1 GB** of free
+space for the speech model (3.5 GB with the optional cleanup model).
 
-### What you need
+### Download (recommended)
 
-- A Mac with **Apple silicon** (M1 or later) running **macOS 26 Tahoe** or later.
+1. Download **Apen-x.y.z.zip** from the [latest release](https://github.com/milescs/apen/releases/latest). It's
+   signed with a Developer ID and notarized by Apple.
+2. Unzip it, drag **Apen** into your **Applications** folder, and open it.
+
+Apen lives in the **menu bar** (an "A" with a leaf), not the Dock. Continue with [First run](#first-run).
+
+### Build from source
+
+This takes a few minutes, mostly downloading packages. You also need:
+
 - **Xcode 26 or later**, free from the [App Store](https://apps.apple.com/app/xcode/id497799835). Open it once after
   installing so it can finish setting up. The Command Line Tools alone aren't enough.
 - **[Homebrew](https://brew.sh)**, which the installer uses to get XcodeGen (or install
   [XcodeGen](https://github.com/yonaskolb/XcodeGen) yourself).
-- About **1 GB** of free space for the speech model, or 3.5 GB with the optional cleanup model.
 
-### Steps
+Open **Terminal** and run:
 
-1. Open **Terminal** and run:
+```bash
+git clone https://github.com/milescs/apen.git
+cd apen
+./scripts/install.sh
+```
 
-   ```bash
-   git clone https://github.com/milescs/apen.git
-   cd apen
-   ./scripts/install.sh
-   ```
-
-   The script checks the requirements, builds Apen, copies it to `/Applications/Apen.app` and opens it. Apen lives
-   in the **menu bar** (an "A" with a leaf), not the Dock.
-
-2. Follow the **Welcome to Apen** window that opens:
-   1. **Microphone**: click *Allow Microphone*.
-   2. **Accessibility**: click *Open Accessibility Settings* and turn on **Apen**. This lets it paste into other apps.
-   3. **Speech model**: click *Download*. It's about 600 MB, downloaded once, and set up in about 20 seconds.
-   4. **Cleanup model** (optional): a 2.5 GB download that tidies filler words and punctuation when cleanup is on.
-   5. **Shortcut**: ⌥Space by default; change it here or later in Settings › General. If you use Superwhisper or
-      another app on ⌥Space, quit it or pick a different shortcut.
-   6. **Try it**: click in the box, tap ⌥Space, say a sentence, and tap ⌥Space again.
-
-3. Optional: turn on **Open Apen at login** in the welcome window or in Settings › General.
-
-### Code signing and permissions
+The script checks the requirements, builds Apen, copies it to `/Applications/Apen.app` and opens it.
 
 If your Mac has an **Apple Development** certificate, the installer signs Apen with it, and macOS then keeps the
 Microphone and Accessibility permissions when you update. You get a free certificate by signing in to Xcode with your
-Apple ID (Xcode › Settings › Accounts).
+Apple ID (Xcode › Settings › Accounts). Without one, Apen is signed ad hoc and works the same, except that after an
+update you may need to remove Apen from System Settings › Privacy & Security › Accessibility with **−** and add it
+again.
 
-Without a certificate, Apen is signed ad hoc and works the same. The only difference is after an update: if pasting
-stops working, open System Settings › Privacy & Security › Accessibility, remove Apen with **−**, and add it again.
+### First run
+
+Follow the **Welcome to Apen** window:
+
+1. **Microphone**: click *Allow Microphone*.
+2. **Accessibility**: click *Open Accessibility Settings* and turn on **Apen**. This lets it paste into other apps.
+3. **Speech model**: click *Download*. It's about 600 MB, downloaded once, and set up in about 20 seconds.
+4. **Cleanup model** (optional): a 2.5 GB download that tidies filler words and punctuation when cleanup is on.
+5. **Shortcut**: ⌥Space by default; change it here or later in Settings › General. If you use Superwhisper or
+   another app on ⌥Space, quit it or pick a different shortcut.
+6. **Try it**: click in the box, tap ⌥Space, say a sentence, and tap ⌥Space again.
+
+Optionally turn on **Open Apen at login** in the welcome window or in Settings › General.
 
 ### Update
 
-```bash
-cd apen
-git pull
-./scripts/install.sh
-```
+- **Download**: quit Apen, download the new release and replace the app in Applications.
+- **Source**: run `git pull` and `./scripts/install.sh` again in your `apen` folder.
 
 ### Uninstall
 
@@ -115,7 +117,7 @@ git pull
 
 | Problem | Fix |
 | --- | --- |
-| Text is copied but not pasted | Turn on Apen under Privacy & Security › Accessibility (remove and re-add it after an ad-hoc rebuild) |
+| Text is copied but not pasted | Turn on Apen under Privacy & Security › Accessibility (after switching between the download and a source build, remove Apen with − and add it again) |
 | ⌥Space does nothing | Another app owns the shortcut. Quit it, or set a new shortcut in Settings › General |
 | "No speech detected" | Check the microphone picker in the menu bar and the input level in the recording panel |
 | First dictation after an update says "Loading model…" for a while | macOS is re-optimizing the model for the Neural Engine (about 20 s, once) |

@@ -68,5 +68,5 @@ else
   ditto -c -k --keepParent "$APP" "$ARTIFACT"
 fi
 
-shasum -a 256 "$ARTIFACT" | tee "$ARTIFACT.sha256"
+(cd "$(dirname "$ARTIFACT")" && shasum -a 256 "$(basename "$ARTIFACT")") | tee "$ARTIFACT.sha256"
 echo "Ready: $ARTIFACT"
