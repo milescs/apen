@@ -17,26 +17,83 @@ are transcribed on this Mac and pasted into whatever window is selected. Nothing
 - **Modes** for the optional cleanup: Coding (prompts for AI coding tools), General, Writing, Message, Email, Notes,
   Raw. Apps switch modes automatically (Cursor/VS Code/Terminal/Claude → Coding, Slack → Message, Mail → Email…).
 
-## Setup
+## Install
 
-Requirements: Apple Silicon, macOS 26, Xcode 27.
+Apen is built from source on your Mac (a few minutes, mostly downloading packages), then installed as a normal app in
+`/Applications`. There's no prebuilt download yet, because distributing one requires Apple notarization.
+
+### What you need
+
+- A Mac with **Apple silicon** (M1 or later) running **macOS 26 Tahoe** or later.
+- **Xcode 26 or later**, free from the [App Store](https://apps.apple.com/app/xcode/id497799835). Open it once after
+  installing so it can finish setting up. The Command Line Tools alone aren't enough.
+- **[Homebrew](https://brew.sh)**, which the installer uses to get XcodeGen (or install
+  [XcodeGen](https://github.com/yonaskolb/XcodeGen) yourself).
+- About **1 GB** of free space for the speech model, or 3.5 GB with the optional cleanup model.
+
+### Steps
+
+1. Open **Terminal** and run:
+
+   ```bash
+   git clone https://github.com/milescs/apen.git
+   cd apen
+   ./scripts/install.sh
+   ```
+
+   The script checks the requirements, builds Apen, copies it to `/Applications/Apen.app` and opens it. Apen lives
+   in the **menu bar** (an "A" with a leaf), not the Dock.
+
+2. Follow the **Welcome to Apen** window that opens:
+   1. **Microphone**: click *Allow Microphone*.
+   2. **Accessibility**: click *Open Accessibility Settings* and turn on **Apen**. This lets it paste into other apps.
+   3. **Speech model**: click *Download*. It's about 600 MB, downloaded once, and set up in about 20 seconds.
+   4. **Cleanup model** (optional): a 2.5 GB download that tidies filler words and punctuation when cleanup is on.
+   5. **Shortcut**: ⌥Space by default; change it here or later in Settings › General. If you use Superwhisper or
+      another app on ⌥Space, quit it or pick a different shortcut.
+   6. **Try it**: click in the box, tap ⌥Space, say a sentence, and tap ⌥Space again.
+
+3. Optional: turn on **Open Apen at login** in the welcome window or in Settings › General.
+
+### Code signing and permissions
+
+If your Mac has an **Apple Development** certificate, the installer signs Apen with it, and macOS then keeps the
+Microphone and Accessibility permissions when you update. You get a free certificate by signing in to Xcode with your
+Apple ID (Xcode › Settings › Accounts).
+
+Without a certificate, Apen is signed ad hoc and works the same. The only difference is after an update: if pasting
+stops working, open System Settings › Privacy & Security › Accessibility, remove Apen with **−**, and add it again.
+
+### Update
 
 ```bash
-make bootstrap   # installs XcodeGen if needed, creates Config/Local.xcconfig, generates the project
-make models      # one-time: downloads Parakeet (~600 MB) + vocabulary model (~100 MB)
-make install     # Release build into /Applications and launches it
+cd apen
+git pull
+./scripts/install.sh
 ```
 
-Set `DEVELOPMENT_TEAM` in `Config/Local.xcconfig` to your Apple Development team so macOS keeps Apen's
-permissions across rebuilds. Without it, builds are ad-hoc signed and you re-grant Accessibility after every
-rebuild.
+### Uninstall
 
-On first launch, the welcome window walks through the rest:
+1. Quit Apen (menu bar › Quit) and delete `/Applications/Apen.app`.
+2. Optionally delete its data:
 
-1. **Microphone**: asked the first time you dictate.
-2. **Accessibility**: lets Apen press ⌘V for you (System Settings › Privacy & Security › Accessibility).
-3. **Models**: the speech model, and optionally the 2.5 GB cleanup model.
-4. **Shortcut**: change it in Settings › General. Quit Superwhisper, which also uses ⌥Space.
+   ```bash
+   rm -rf ~/Library/Application\ Support/Apen
+   rm -rf ~/Library/Application\ Support/FluidAudio/Models/parakeet-unified-en-0.6b ~/Library/Application\ Support/FluidAudio/Models/parakeet-ctc-110m-coreml
+   defaults delete com.milescs.apen
+   ```
+
+3. Remove Apen from System Settings › Privacy & Security › Accessibility and › Microphone.
+
+### Troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| Text is copied but not pasted | Turn on Apen under Privacy & Security › Accessibility (remove and re-add it after an ad-hoc rebuild) |
+| ⌥Space does nothing | Another app owns the shortcut. Quit it, or set a new shortcut in Settings › General |
+| "No speech detected" | Check the microphone picker in the menu bar and the input level in the recording panel |
+| First dictation after an update says "Loading model…" for a while | macOS is re-optimizing the model for the Neural Engine (about 20 s, once) |
+| `xcodebuild` errors about the Command Line Tools | Run `sudo xcode-select -s /Applications/Xcode.app` |
 
 ## Using it
 
@@ -62,6 +119,8 @@ On first launch, the welcome window walks through the rest:
 ## Development
 
 ```bash
+make bootstrap     # installs XcodeGen and generates Apen.xcodeproj
+make models        # optional: download the speech models from the command line instead of the app
 make test          # unit tests (dictionary, triggers, text, cleanup prompt/guard, stores)
 make fixtures      # speech fixtures generated with `say`
 make integration   # model-backed tests: accuracy, long-form, latency, boosting, cleanup, memory
@@ -81,5 +140,10 @@ Measured on an M3 Max:
   - While dictating: about 60 MB for Apen, plus about 665 MB for the cleanup helper when cleanup is on.
   - After the paste: back to idle, and the helper has exited.
 
-See [AGENTS.md](AGENTS.md) for architecture and conventions. Third-party licenses are in
-[LICENSES/THIRD_PARTY.md](LICENSES/THIRD_PARTY.md).
+See [AGENTS.md](AGENTS.md) for architecture and conventions.
+
+## License
+
+Apen is released under the [MIT License](LICENSE). The models and libraries it downloads and uses have their own
+licenses, listed in [LICENSES/THIRD_PARTY.md](LICENSES/THIRD_PARTY.md). Among them, Parakeet Unified is licensed by
+NVIDIA Corporation under the NVIDIA Open Model License.

@@ -32,7 +32,8 @@ Qwen3-4B-Instruct-2507 through llama.cpp. English only.
 
 | Task | Command |
 | --- | --- |
-| First setup | `make bootstrap && make models` |
+| Install for use | `./scripts/install.sh` (builds, signs, copies to /Applications) |
+| First dev setup | `make bootstrap && make models` |
 | Unit tests | `make test` |
 | Model-backed tests | `make integration` |
 | Build + run (Debug) | `make run` |

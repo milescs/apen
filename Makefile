@@ -13,9 +13,8 @@ RELEASE_APP := $(DERIVED)/Build/Products/Release/Apen.app
 
 .PHONY: bootstrap generate build release test integration fixtures run install models reset-tcc clean
 
-bootstrap: ## Install tools, create local signing config, generate the project
+bootstrap: ## Install XcodeGen and generate the project (signing: see Config/Local.xcconfig.example)
 	@command -v xcodegen >/dev/null || brew install xcodegen
-	@test -f Config/Local.xcconfig || (cp Config/Local.xcconfig.example Config/Local.xcconfig && echo "Edit Config/Local.xcconfig to set your DEVELOPMENT_TEAM")
 	@$(MAKE) generate
 
 generate: ## Regenerate Apen.xcodeproj from project.yml
