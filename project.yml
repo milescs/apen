@@ -74,6 +74,16 @@ targets:
         codeSign: true
         copy:
           destination: executables
+    postBuildScripts:
+      - name: Unsign SwiftPM resource bundles
+        basedOnDependencyAnalysis: false
+        script: |
+          # SwiftPM resource bundles hold only data, but Xcode signs them with the build identity and an App Store
+          # export doesn't re-sign bundles in Contents/Resources, so App Store Connect rejects the upload
+          # (ITMS-90284). Unsigned, they are sealed as plain resources by the app's own signature.
+          for bundle in "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"/*.bundle; do
+            rm -rf "${bundle}/Contents/_CodeSignature"
+          done
 
   ApenLLMHelper:
     type: tool

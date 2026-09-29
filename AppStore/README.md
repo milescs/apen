@@ -13,4 +13,5 @@ swift AppStore/make-screenshots.swift
 ```
 
 Limits: name and subtitle 30 characters, promotional text 170, keywords 100 (comma-separated, no words already in
-the name or subtitle), description 4,000.
+the name or subtitle), description 4,000. App Store Connect rejects some symbols in these fields, including ⌥, so
+write "Option-Space".

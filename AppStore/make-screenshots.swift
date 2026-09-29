@@ -143,10 +143,10 @@ render("1-dictate-anywhere.png") {
 let slides: [(file: String, title: String, subtitle: String, capture: String)] = [
     ("2-private.png", "Private by design",
      "Speech is transcribed on your Mac with open-weight models. No account, no cloud.", "welcome.png"),
-    ("3-modes.png", "The right style for every app",
-     "Optional cleanup by a local LLM for coding prompts, messages, email and notes.", "settings-modes.png"),
-    ("4-dictionary.png", "Your jargon, spelled right",
+    ("3-dictionary.png", "Your jargon, spelled right",
      "Say “RLS” and get “row-level security”. Teach Apen your acronyms and names.", "dictionary.png"),
+    ("4-modes.png", "The right style for every app",
+     "Optional cleanup by a local LLM for coding prompts, messages, email and notes.", "settings-modes.png"),
     ("5-history.png", "Every dictation, one click away",
      "Searchable history that stays on your Mac, with Copy on every transcript.", "history.png"),
 ]

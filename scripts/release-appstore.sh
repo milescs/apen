@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 # Archives the sandboxed App Store version and uploads it to App Store Connect.
 #   APEN_BUILD=<n> overrides the build number (it must increase with every upload).
+#   --archive-only  stops after archiving (this also registers the bundle ID, which App Store Connect needs
+#                   before it can create the app record)
+#   --upload-only   uploads the archive made earlier with the same APEN_BUILD
 source "$(dirname "$0")/release-common.sh"
-BUILD="${APEN_BUILD:-$(date +%Y%m%d%H%M)}"
+BUILD="${APEN_BUILD:-$(date +%Y%m%d.%H%M)}"
 ARCHIVE="$DIST/Apen-$VERSION-$BUILD-AppStore.xcarchive"
 
-step "Archiving Apen $VERSION ($BUILD) for the Mac App Store"
-xcodegen generate --quiet
-xcodebuild -project Apen.xcodeproj -scheme Apen -configuration AppStore -destination 'generic/platform=macOS' \
-  -archivePath "$ARCHIVE" "${AUTH[@]}" "${SIGNING[@]}" CURRENT_PROJECT_VERSION="$BUILD" -quiet archive
+if [[ "${1:-}" != "--upload-only" ]]; then
+  step "Archiving Apen $VERSION ($BUILD) for the Mac App Store"
+  xcodegen generate --quiet
+  xcodebuild -project Apen.xcodeproj -scheme Apen -configuration AppStore -destination 'generic/platform=macOS' \
+    -archivePath "$ARCHIVE" "${AUTH[@]}" "${SIGNING[@]}" CURRENT_PROJECT_VERSION="$BUILD" -quiet archive
+  [[ "${1:-}" == "--archive-only" ]] && { echo "Archived: $ARCHIVE (upload with APEN_BUILD=$BUILD $0 --upload-only)"; exit 0; }
+fi
+[[ -d "$ARCHIVE" ]] || { echo "No archive at $ARCHIVE" >&2; exit 1; }
 
 step "Uploading to App Store Connect"
 cat > "$DIST/export-appstore.plist" <<PLIST
