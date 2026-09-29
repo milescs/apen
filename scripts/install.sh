@@ -48,7 +48,7 @@ if [[ -f Config/Local.xcconfig ]]; then
 elif (( ADHOC == 0 )) && identity="$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 '"Apple Development' | sed -E 's/.*"(.*)"/\1/')" && [[ -n "$identity" ]]; then
   team="$(security find-certificate -c "$identity" -p 2>/dev/null | openssl x509 -noout -subject 2>/dev/null | sed -nE 's/.*OU ?= ?([A-Z0-9]{10}).*/\1/p')"
   if [[ -n "$team" ]]; then
-    printf 'DEVELOPMENT_TEAM = %s\nCODE_SIGN_IDENTITY = Apple Development\n' "$team" > Config/Local.xcconfig
+    printf 'DEVELOPMENT_TEAM = %s\nCODE_SIGN_IDENTITY = Apple Development\nENABLE_HARDENED_RUNTIME = YES\n' "$team" > Config/Local.xcconfig
     echo "Signing with your Apple Development certificate (team $team); macOS keeps Apen's permissions across updates."
   else
     echo "Couldn't read the team from your certificate; building with an ad-hoc signature."

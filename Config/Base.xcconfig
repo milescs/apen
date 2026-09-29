@@ -2,18 +2,20 @@
 MACOSX_DEPLOYMENT_TARGET = 26.0
 SWIFT_VERSION = 6.0
 SWIFT_STRICT_CONCURRENCY = complete
-ENABLE_HARDENED_RUNTIME = YES
 ENABLE_APP_SANDBOX = NO
 CODE_SIGN_ENTITLEMENTS = App/Apen.entitlements
 PRODUCT_BUNDLE_IDENTIFIER = com.milescs.apen
 MARKETING_VERSION = 0.1.0
 CURRENT_PROJECT_VERSION = 1
 
-// Ad-hoc signing by default. Config/Local.xcconfig (gitignored) switches to an Apple Development
-// identity so Microphone and Accessibility grants survive rebuilds.
+// Ad-hoc signing by default. Config/Local.xcconfig (gitignored; written by scripts/install.sh when an
+// Apple Development certificate exists) switches to that identity so Microphone and Accessibility grants
+// survive rebuilds, and turns on the hardened runtime. The hardened runtime stays off for ad-hoc builds:
+// its library validation refuses the embedded llama.framework when neither signature has a team.
 CODE_SIGN_STYLE = Manual
 CODE_SIGN_IDENTITY = -
 DEVELOPMENT_TEAM =
 PROVISIONING_PROFILE_SPECIFIER =
+ENABLE_HARDENED_RUNTIME = NO
 
 #include? "Local.xcconfig"

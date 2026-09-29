@@ -21,10 +21,10 @@ generate: ## Regenerate Apen.xcodeproj from project.yml
 	xcodegen generate --quiet
 
 build: generate ## Debug build of the app
-	$(XCODEBUILD) -project $(PROJECT) -scheme $(SCHEME) -configuration Debug -derivedDataPath $(DERIVED) -quiet build
+	$(XCODEBUILD) -project $(PROJECT) -scheme $(SCHEME) -configuration Debug -destination 'platform=macOS,arch=arm64' -derivedDataPath $(DERIVED) -quiet build
 
 release: generate ## Release build of the app
-	$(XCODEBUILD) -project $(PROJECT) -scheme $(SCHEME) -configuration Release -derivedDataPath $(DERIVED) -quiet build
+	$(XCODEBUILD) -project $(PROJECT) -scheme $(SCHEME) -configuration Release -destination 'platform=macOS,arch=arm64' -derivedDataPath $(DERIVED) -quiet build
 
 test: ## Fast unit tests (ApenCore)
 	cd $(KIT) && swift test --filter ApenCoreTests

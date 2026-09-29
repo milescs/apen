@@ -4,3 +4,4 @@
 // Your team ID is the OU field of: security find-certificate -c "Apple Development" -p | openssl x509 -noout -subject
 DEVELOPMENT_TEAM = ABCDE12345
 CODE_SIGN_IDENTITY = Apple Development
+ENABLE_HARDENED_RUNTIME = YES
