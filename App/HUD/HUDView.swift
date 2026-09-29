@@ -72,7 +72,7 @@ private struct RecordingRow: View {
                 ModeChip(mode: model.activeMode, automatic: model.activeModeIsAutomatic)
                 TimelineView(.periodic(from: .now, by: 0.25)) { context in
                     if let loading = model.modelLoadProgress(at: context.date) {
-                        Text("Loading model \(Int(loading * 100))%")
+                        Text("Loading \(Int(loading * 100))%")
                             .font(.caption2)
                             .monospacedDigit()
                             .foregroundStyle(.secondary)
@@ -192,7 +192,8 @@ private struct LevelMeter: View {
     @State private var history = LevelHistory()
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30)) { _ in
+        // A periodic schedule keeps ticking in the never-key HUD panel (the animation schedule may not).
+        TimelineView(.periodic(from: .now, by: 1.0 / 30)) { _ in
             let levels = history.push(model.currentLevel)
             HStack(alignment: .center, spacing: 2) {
                 ForEach(levels.indices, id: \.self) { index in
@@ -208,7 +209,7 @@ private struct LevelMeter: View {
 
 @MainActor
 private final class LevelHistory {
-    private var values = [Float](repeating: 0, count: 20)
+    private var values = [Float](repeating: 0, count: 16)
 
     func push(_ level: Float) -> [Float] {
         values.removeFirst()

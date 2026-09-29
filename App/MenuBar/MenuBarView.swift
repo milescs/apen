@@ -202,10 +202,11 @@ private struct RecentList: View {
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 6)
             } else {
-                // Only scroll when the list doesn't fit; otherwise the popover hugs its content.
+                // Only scroll when the list doesn't fit; otherwise the popover hugs its content. The scrolling
+                // variant needs a fixed height: a ScrollView's ideal height is zero, which hid the whole list.
                 ViewThatFits(in: .vertical) {
                     rows
-                    ScrollView { rows }
+                    ScrollView { rows }.frame(height: 320)
                 }
                 .frame(maxHeight: 320)
             }
@@ -223,7 +224,7 @@ private struct RecentList: View {
     private func row(_ record: TranscriptRecord) -> some View {
         HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(record.status == .failed ? "Transcription failed — open History to retry" : record.finalText)
+                Text(record.status == .failed ? "Transcription failed — open History to retry" : (expandedID == record.id ? record.finalText : record.finalText.previewLine))
                     .font(.callout)
                     .lineLimit(expandedID == record.id ? 12 : 2)
                     .foregroundStyle(record.status == .failed ? .orange : .primary)

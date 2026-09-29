@@ -112,7 +112,7 @@ private struct HistoryRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(record.status == .failed ? "Transcription failed" : record.finalText)
+            Text(record.status == .failed ? "Transcription failed" : record.finalText.previewLine)
                 .lineLimit(2)
                 .foregroundStyle(record.status == .failed ? .orange : .primary)
             HStack(spacing: 6) {
@@ -201,5 +201,12 @@ private struct HistoryDetail: View {
             try? await Task.sleep(for: .seconds(1.5))
             if copied == which { copied = nil }
         }
+    }
+}
+
+extension String {
+    /// Single-line preview: line breaks and runs of whitespace collapse to one space.
+    var previewLine: String {
+        split(whereSeparator: \.isWhitespace).joined(separator: " ")
     }
 }

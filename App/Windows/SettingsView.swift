@@ -7,15 +7,20 @@ struct SettingsView: View {
     let model: AppModel
 
     var body: some View {
-        TabView {
+        @Bindable var model = model
+        TabView(selection: $model.settingsTab) {
             GeneralSettings(model: model)
                 .tabItem { Label("General", systemImage: "gearshape") }
+                .tag("general")
             ModesSettings(model: model)
                 .tabItem { Label("Modes", systemImage: "square.stack.3d.up") }
+                .tag("modes")
             ModelsSettings(model: model)
                 .tabItem { Label("Models", systemImage: "cpu") }
+                .tag("models")
             CleanupSettings(model: model)
                 .tabItem { Label("Cleanup", systemImage: "sparkles") }
+                .tag("cleanup")
         }
         .padding(.top, 8)
         .frame(minWidth: 620, minHeight: 500)
@@ -306,7 +311,7 @@ private struct ModeDetail: View {
                 List(apps, id: \.self, selection: $selectedApp) { bundleID in
                     AppRow(bundleID: bundleID)
                 }
-                .frame(minHeight: 120)
+                .frame(height: 220)
                 HStack {
                     Button("Add App…") { addApp() }
                     Button("Remove") {
@@ -372,9 +377,36 @@ private struct AppRow: View {
                 Text(FileManager.default.displayName(atPath: url.path).replacingOccurrences(of: ".app", with: ""))
             } else {
                 Image(systemName: "app.dashed").frame(width: 18, height: 18)
-                Text(bundleID).foregroundStyle(.secondary)
+                Text(KnownApps.name(for: bundleID)).foregroundStyle(.secondary)
+                Text("not installed").font(.caption).foregroundStyle(.tertiary)
             }
         }
         .tag(bundleID)
     }
+}
+
+/// Friendly names for the default per-app mode assignments, for apps that aren't installed.
+enum KnownApps {
+    static func name(for bundleID: String) -> String {
+        names[bundleID] ?? bundleID
+    }
+
+    private static let names: [String: String] = [
+        "com.microsoft.VSCode": "Visual Studio Code", "com.microsoft.VSCodeInsiders": "VS Code Insiders",
+        "com.todesktop.230313mzl4w4u92": "Cursor", "com.exafunction.windsurf": "Windsurf", "dev.zed.Zed": "Zed",
+        "com.apple.dt.Xcode": "Xcode", "com.apple.Terminal": "Terminal", "com.googlecode.iterm2": "iTerm",
+        "dev.warp.Warp-Stable": "Warp", "com.mitchellh.ghostty": "Ghostty", "net.kovidgoyal.kitty": "kitty",
+        "com.github.wez.wezterm": "WezTerm", "com.jetbrains.intellij": "IntelliJ IDEA",
+        "com.jetbrains.WebStorm": "WebStorm", "com.jetbrains.pycharm": "PyCharm", "com.jetbrains.goland": "GoLand",
+        "com.google.android.studio": "Android Studio", "com.anthropic.claudefordesktop": "Claude",
+        "com.openai.chat": "ChatGPT", "com.openai.codex": "Codex",
+        "com.apple.iWork.Pages": "Pages", "com.microsoft.Word": "Microsoft Word", "notion.id": "Notion",
+        "com.apple.TextEdit": "TextEdit", "com.ulyssesapp.mac": "Ulysses", "abnerworks.Typora": "Typora",
+        "com.tinyspeck.slackmacgap": "Slack", "com.apple.MobileSMS": "Messages", "com.hnc.Discord": "Discord",
+        "ru.keepcoder.Telegram": "Telegram", "net.whatsapp.WhatsApp": "WhatsApp", "com.microsoft.teams2": "Microsoft Teams",
+        "us.zoom.xos": "Zoom", "com.apple.mail": "Mail", "com.microsoft.Outlook": "Outlook",
+        "com.readdle.smartemail-Mac": "Spark", "com.superhuman.electron": "Superhuman",
+        "com.mimestream.Mimestream": "Mimestream", "com.apple.Notes": "Notes", "md.obsidian": "Obsidian",
+        "com.agiletortoise.Drafts-OSX": "Drafts", "net.shinyfrog.bear": "Bear",
+    ]
 }
