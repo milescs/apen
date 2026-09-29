@@ -19,3 +19,6 @@ Fixtures/real/
 
 # Release credentials (team/key IDs; the .p8 stays in ~/.appstoreconnect)
 Config/Release.env
+
+# Generated App Store screenshots (swift AppStore/make-screenshots.swift)
+AppStore/screenshots/
